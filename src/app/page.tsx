@@ -2,6 +2,10 @@ import Image from "next/image";
 import DLRForm from "./(components)/Forms/DLRForm";
 import Login from "./(components)/Forms/Login"
 import Register from "./(components)/Forms/Register"
+import DLRTable from "./(components)/Tables/DLRTable"
+import UsersTable from "./(components)/Tables/UsersTable"
+import TimeEntryForm from "./(components)/Forms/TimeEntryForm"
+import DraftTimeEntries from "./(components)/Tables/DraftTimeEntries"
 
 
 export default function Home() {
@@ -12,6 +16,10 @@ export default function Home() {
         <Login/>
         <Register/>
         <DLRForm/>
+        <TimeEntryForm/>
+        <DraftTimeEntries/>
+        <DLRTable/>
+        <UsersTable/>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
        
