@@ -6,6 +6,7 @@ import DLRTable from "./(components)/Tables/DLRTable"
 import UsersTable from "./(components)/Tables/UsersTable"
 import TimeEntryForm from "./(components)/Forms/TimeEntryForm"
 import DraftTimeEntries from "./(components)/Tables/DraftTimeEntries"
+import DraftDLRsTable from "./(components)/Tables/DraftDLRsTable"
 
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
         <Login/>
         <Register/>
         <DLRForm/>
+        <DraftDLRsTable/>
         <TimeEntryForm/>
         <DraftTimeEntries/>
         <DLRTable/>

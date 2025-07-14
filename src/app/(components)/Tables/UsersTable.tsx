@@ -1,13 +1,9 @@
 "use client";
-import { useState } from "react";
-import Header from "@/app/(components)/Header"
 
-import {
-  DataGrid,
-  GridColDef,
-  GridRenderCellParams,
-} from "@mui/x-data-grid";
-import { TrashIcon } from "lucide-react";
+import { useState, useEffect } from "react";
+import Header from "@/app/(components)/Header";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { Trash2Icon, SearchIcon, PlusCircleIcon } from "lucide-react";
 import {
   Select,
   SelectTrigger,
@@ -15,6 +11,8 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const mockUsers = [
   {
@@ -35,6 +33,20 @@ const mockUsers = [
 
 export default function UsersTable() {
   const [rows, setRows] = useState(mockUsers);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    if (!search) {
+      setRows(mockUsers);
+    } else {
+      const filtered = mockUsers.filter((user) =>
+        Object.values(user).some((value) =>
+          String(value).toLowerCase().includes(search.toLowerCase())
+        )
+      );
+      setRows(filtered);
+    }
+  }, [search]);
 
   const handleRoleChange = (id: string, newRole: string) => {
     setRows((prev) =>
@@ -106,7 +118,7 @@ export default function UsersTable() {
           onClick={() => handleDelete(params.row.userId)}
           className="text-red-500 hover:text-red-700"
         >
-          <TrashIcon className="w-5 h-5" />
+          <Trash2Icon className="w-5 h-5" />
         </button>
       ),
     },
@@ -114,18 +126,36 @@ export default function UsersTable() {
 
   return (
     <div className="w-full mx-auto p-8 space-y-6 border rounded-xl bg-white shadow-md dark:bg-zinc-900 border-zinc-800 m-20">
-             <div className="flex justify-between items-center">
+      {/* Header */}
+      <div className="flex justify-between items-center">
         <Header name="Users" />
-       
+        <Button className="flex items-center space-x-2">
+          <PlusCircleIcon className="w-4 h-4" />
+          <span>Add New User</span>
+        </Button>
       </div>
+
+      {/* Search Bar */}
+      <div className="flex items-center border border-gray-300 rounded px-3 py-2 w-full max-w-md">
+        <SearchIcon className="w-5 h-5 text-gray-500 mr-2" />
+        <Input
+          type="text"
+          placeholder="Search by name, email, role, or status..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full border-none focus:outline-none bg-transparent text-sm"
+        />
+      </div>
+
+      {/* Table */}
       <DataGrid
         rows={rows}
         columns={columns}
         getRowId={(row) => row.userId}
         checkboxSelection
         autoHeight
-        className="h-[400px] w-[100%] bg-white shadow rounded-lg border border-gray-200 !text-gray-700"
+        className="h-[400px] w-[100%] bg-white shadow rounded-lg border border-gray-200 !text-gray-700 dark:bg-zinc-900 dark:!text-gray-300"
       />
     </div>
   );
-}
+};
