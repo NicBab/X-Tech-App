@@ -28,4 +28,26 @@ export default function Home() {
       </footer>
     </div>
   );
-}
+};
+
+
+// "use client";
+
+// import { useEffect } from "react";
+// import { useRouter } from "next/navigation";
+// import { useAppSelector } from "@/redux/hooks";
+
+// export default function HomePage() {
+//   const router = useRouter();
+//   const role = useAppSelector((state) => state.user.role); // "admin" or "employee"
+
+//   useEffect(() => {
+//     if (role === "admin") {
+//       router.push("/admin/dashboard");
+//     } else if (role === "employee") {
+//       router.push("/employee/dashboard");
+//     }
+//   }, [role, router]);
+
+//   return null; // or loading spinner
+// }

@@ -3,7 +3,8 @@
 import React, { useEffect } from "react";
 import AdminNavbar from "@/app/(components)/Navbar/AdminNavbar";
 import AdminSidebar from "@/app/(components)/Sidebar/AdminSidebar";
-import StoreProvider, { useAppSelector } from "../dashboardWrapper/redux";
+import StoreProvider from "@/redux/provider";
+import { useAppSelector } from "@/redux/hooks";
 
 const AdminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const isSidebarCollapsed = useAppSelector((state) => state.global.isSidebarCollapsed);
@@ -14,7 +15,7 @@ const AdminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
   }, [isDarkMode]);
 
   return (
-    <div className={`flex w-full min-h-screen ${isDarkMode ? "dark" : "light"}`}>      
+    <div className={`flex w-full min-h-screen ${isDarkMode ? "dark" : "light"}`}>
       <AdminSidebar />
       <main
         className={`flex flex-col w-full h-full py-7 px-9 bg-gray-50 dark:bg-zinc-900 ${

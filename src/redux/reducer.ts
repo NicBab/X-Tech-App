@@ -1,6 +1,6 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import globalReducer from "./slices/GlobalSlice";
-import userReducer from "./slices/UserSlice";
+import globalReducer from "./slices/global/GlobalSlice";
+import userReducer from "./slices/user/UserSlice";
 import { api } from "./api/api";
 
 const rootReducer = combineReducers({
