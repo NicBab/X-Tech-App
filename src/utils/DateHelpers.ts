@@ -1,3 +1,10 @@
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
 export function getPreviousWeekRange(): { start: Date; end: Date } {
   const today = new Date();
   const day = today.getDay(); // 0 = Sunday, 1 = Monday, ...
