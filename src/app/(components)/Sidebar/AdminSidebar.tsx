@@ -2,6 +2,7 @@
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks"
 import { setIsSidebarCollapsed } from "@/redux/slices/global/GlobalSlice"
+import TimeEntryForm from "../Forms/TimeEntryForm";
 import {
   Archive,
   CircleDollarSign,
@@ -11,6 +12,7 @@ import {
   Menu,
   SlidersHorizontal,
   User,
+  CalendarClock,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -113,8 +115,8 @@ const Sidebar = () => {
           isCollapsed={isSidebarCollapsed}
         />
               <SidebarLink
-          href=""
-          icon={Archive}
+          href="/TimeEntryForm"
+        icon={CalendarClock}
           label="Clock In/Out"
           isCollapsed={isSidebarCollapsed}
         />

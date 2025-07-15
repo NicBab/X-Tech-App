@@ -20,7 +20,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-white p-4">
+    <div className="min-h-screen w-full flex items-center justify-center p-4">
       <Card className="w-full max-w-md border border-zinc-800 shadow-md">
         <CardContent className="p-6 sm:p-8 space-y-6 text-gray-900">
           <h2 className="text-2xl font-bold text-center">Register</h2>

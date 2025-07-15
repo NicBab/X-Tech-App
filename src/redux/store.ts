@@ -1,23 +1,25 @@
-import { configureStore } from "@reduxjs/toolkit";
-import {
-  persistStore,
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from "redux-persist";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import globalReducer from "./slices/global/GlobalSlice";
+import userReducer from "./slices/user/UserSlice";
+import timeReducer from "./slices/time/TimeSlice"; 
+import { api } from "./api/api"; // RTK Query api
 import storage from "redux-persist/lib/storage";
-import rootReducer from "./reducer";
-import { api } from "./api/api";
+import { persistStore, persistReducer } from "redux-persist";
+import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
 
 const persistConfig = {
   key: "root",
+  version: 1,
   storage,
-  whitelist: ["global", "user"],
+  whitelist: ["global", "user"], 
 };
+
+const rootReducer = combineReducers({
+  global: globalReducer,
+  user: userReducer,
+  time: timeReducer,
+  [api.reducerPath]: api.reducer,
+});
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
@@ -32,6 +34,5 @@ export const store = configureStore({
 });
 
 export const persistor = persistStore(store);
-
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
