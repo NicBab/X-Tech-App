@@ -12,7 +12,8 @@ import {
   Menu,
   SlidersHorizontal,
   User,
-  CalendarClock,
+  ClockPlus,
+  
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -116,7 +117,7 @@ const Sidebar = () => {
         />
               <SidebarLink
           href="/TimeEntryForm"
-        icon={CalendarClock}
+        icon={ClockPlus}
           label="Clock In/Out"
           isCollapsed={isSidebarCollapsed}
         />
@@ -128,7 +129,7 @@ const Sidebar = () => {
         />
             <SidebarLink
           href=""
-          icon={Archive}
+          icon={Clipboard}
           label="DLRs"
           isCollapsed={isSidebarCollapsed}
         />
@@ -147,7 +148,7 @@ const Sidebar = () => {
         />
         <SidebarLink
           href="/products"
-          icon={Clipboard}
+          icon={Archive}
           label="Products"
           isCollapsed={isSidebarCollapsed}
         />

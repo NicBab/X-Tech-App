@@ -1,20 +1,22 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent } from "@/components/ui/card"
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center from-gray-950 to-zinc-900 p-4 text-white">
-      <Card className="w-full max-w-md shadow-lg border-zinc-800">
+    <div className="min-h-screen w-full flex items-center justify-center from-gray-950 to-zinc-800 p-4 text-white z-2">
+      <Card className="w-full max-w-md shadow-lg">
         <CardContent className="p-6 space-y-6">
-          <h2 className="text-2xl font-bold text-center">Login to X Technology Portal</h2>
+          <h2 className="text-2xl font-bold text-center">
+            Login
+          </h2>
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -39,7 +41,7 @@ export default function LoginPage() {
           </div>
 
           <Button className="w-full mt-4">Login</Button>
-{/* 
+          {/* 
           <Button variant="secondary" className="w-full" disabled>
             Login with Company Email (coming soon)
           </Button> */}
@@ -51,5 +53,5 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

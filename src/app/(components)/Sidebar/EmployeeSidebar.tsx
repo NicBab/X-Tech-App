@@ -11,6 +11,12 @@ import {
   Menu,
   SlidersHorizontal,
   User,
+  ClockPlus,
+  CalendarClock,
+  ClipboardPenLine,
+  ClipboardCheck,
+  AlarmClockCheck,
+  AlarmClockPlus
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -112,47 +118,40 @@ const Sidebar = () => {
           label="Dashboard"
           isCollapsed={isSidebarCollapsed}
         />
+                   <SidebarLink
+          href=""
+          icon={Clipboard}
+          label="New DLR"
+          isCollapsed={isSidebarCollapsed}
+        />
+                       <SidebarLink
+          href=""
+          icon={ClipboardPenLine}
+          label="Drafted DLRs"
+          isCollapsed={isSidebarCollapsed}
+        />
+                          <SidebarLink
+          href=""
+          icon={ClipboardCheck}
+          label="Submitted DLRs"
+          isCollapsed={isSidebarCollapsed}
+        />
               <SidebarLink
           href=""
-          icon={Archive}
+          icon={CalendarClock}
           label="Clock In/Out"
           isCollapsed={isSidebarCollapsed}
         />
             <SidebarLink
           href=""
-          icon={Archive}
+          icon={AlarmClockPlus}
           label="Drafted Times"
           isCollapsed={isSidebarCollapsed}
         />
             <SidebarLink
           href=""
-          icon={Archive}
-          label="DLRs"
-          isCollapsed={isSidebarCollapsed}
-        />
-            <SidebarLink
-          href=""
-          icon={Archive}
-          label="Employee Times"
-          isCollapsed={isSidebarCollapsed}
-        />
-
-        <SidebarLink
-          href="/inventory"
-          icon={Archive}
-          label="Inventory"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/products"
-          icon={Clipboard}
-          label="Products"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/users"
-          icon={User}
-          label="Users"
+          icon={AlarmClockCheck}
+          label="Submitted Times"
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink
@@ -161,12 +160,7 @@ const Sidebar = () => {
           label="Settings"
           isCollapsed={isSidebarCollapsed}
         />
-        <SidebarLink
-          href="/expenses"
-          icon={CircleDollarSign}
-          label="Expenses"
-          isCollapsed={isSidebarCollapsed}
-        />
+  
       </div>
 
       {/* FOOTER */}
