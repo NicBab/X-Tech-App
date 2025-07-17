@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import Link from "next/link"
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -20,8 +21,8 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border border-zinc-800 shadow-md">
+        <div className="min-h-screen w-full flex items-center justify-center from-gray-950 to-zinc-800 p-4 text-white z-2">
+      <Card className="w-full max-w-md border shadow-md">
         <CardContent className="p-6 sm:p-8 space-y-6 text-gray-900">
           <h2 className="text-2xl font-bold text-center">Register</h2>
 
@@ -89,7 +90,11 @@ export default function RegisterPage() {
 
           <div className="text-sm text-center text-gray-600 pt-2">
             Already have an account?{" "}
-            <span className="underline cursor-pointer">Login</span>
+            <span className="underline cursor-pointer">
+              <Link href="/login" title="login">
+              Login
+              </Link>
+              </span>
           </div>
         </CardContent>
       </Card>

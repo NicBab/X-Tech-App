@@ -1,9 +1,9 @@
 "use client";
 
-import LoginForm from "@/app/(components)/Forms/LoginForm";
+import RegisterForm from "@/app/(components)/Forms/RegisterForm";
 import Image from "next/image";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   return (
     <section className="relative w-full min-h-screen overflow-hidden">
       {/* Background Image */}
@@ -18,15 +18,12 @@ export default function LoginPage() {
         />
         {/* Black Overlay */}
         <div className="absolute inset-0 bg-primary opacity-10 z-1" />
-        {/* Login Form */}
+        {/* Register Form */}
         <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-zinc-900 z-2">
-          <LoginForm />
+          <RegisterForm />
         </div>
       </div>
     </section>
   );
 }
-
-
-
 

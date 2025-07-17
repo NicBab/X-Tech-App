@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,9 +15,7 @@ export default function LoginPage() {
     <div className="min-h-screen w-full flex items-center justify-center from-gray-950 to-zinc-800 p-4 text-white z-2">
       <Card className="w-full max-w-md shadow-lg">
         <CardContent className="p-6 space-y-6">
-          <h2 className="text-2xl font-bold text-center">
-            Login
-          </h2>
+          <h2 className="text-2xl font-bold text-center">Login</h2>
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -48,7 +47,11 @@ export default function LoginPage() {
 
           <div className="flex justify-between pt-2 text-sm text-muted-foreground">
             <span className="cursor-pointer underline">Forgot password?</span>
-            <span className="cursor-pointer underline">Register</span>
+            <span className="cursor-pointer underline">
+              <Link href="/register" title="Register">
+                Register
+              </Link>
+            </span>
           </div>
         </CardContent>
       </Card>
