@@ -12,6 +12,7 @@ export default function RegisterPage() {
     name: "",
     email: "",
     companyEmail: "",
+    phoneNumber: "",
     password: "",
     confirmPassword: "",
   })
@@ -39,18 +40,6 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Personal Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="you@example.com"
-              value={form.email}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="companyEmail">Company Email</Label>
             <Input
               id="companyEmail"
@@ -58,6 +47,18 @@ export default function RegisterPage() {
               type="email"
               placeholder="you@xtechnology-usa.com"
               value={form.companyEmail}
+              onChange={handleChange}
+            />
+          </div>
+
+        <div className="space-y-2">
+            <Label htmlFor="phone">Phone Number</Label>
+            <Input
+              id="phoneNumber"
+              name="phoneNumber"
+              type="text"
+              placeholder="1-"
+              value={form.phoneNumber}
               onChange={handleChange}
             />
           </div>
