@@ -1,6 +1,6 @@
 "use client";
 
-import RegisterForm from "@/app/(components)/Forms/RegisterForm";
+import RegisterForm from "@/app/(components)/Forms/auth/RegisterForm";
 import Image from "next/image";
 
 export default function RegisterPage() {

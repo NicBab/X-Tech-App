@@ -7,4 +7,5 @@ export interface UserState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  token?: string | null;
 }

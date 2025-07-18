@@ -1,6 +1,6 @@
 "use client";
 
-import LoginForm from "@/app/(components)/Forms/LoginForm";
+import LoginForm from "@/app/(components)/Forms/auth/LoginForm";
 import Image from "next/image";
 
 export default function LoginPage() {

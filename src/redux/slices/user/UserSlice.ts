@@ -6,10 +6,12 @@ const initialState: UserState = {
   userId: null,
   name: "",
   email: "",
+  phoneNumber: "",
   role: null,
   isAuthenticated: false,
   loading: false,
   error: null,
+  token: null,
 };
 
 const userSlice = createSlice({
@@ -20,8 +22,18 @@ const userSlice = createSlice({
       state.userId = null;
       state.name = "";
       state.email = "";
+      state.phoneNumber = "";
       state.role = null;
       state.isAuthenticated = false;
+      state.loading = false;
+      state.error = null;
+    },
+    setUser: (state, action: PayloadAction<UserState>) => {
+      Object.assign(state, action.payload, {
+        isAuthenticated: true,
+        loading: false,
+        error: null,
+      });
     },
   },
   extraReducers: (builder) => {
@@ -47,5 +59,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { logoutUser } = userSlice.actions;
+export const { logoutUser, setUser } = userSlice.actions;
 export default userSlice.reducer;

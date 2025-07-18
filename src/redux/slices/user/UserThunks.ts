@@ -10,10 +10,12 @@ export const loginUser = createAsyncThunk(
       userId: "123",
       name: "Nick Babineaux",
       email: credentials.email,
+      phoneNumber: "",
       role: credentials.email === "admin@xtechnology-usa.com" ? "admin" : "user",
       isAuthenticated: true,
       loading: false,
       error: null,
+    
     };
     await new Promise((res) => setTimeout(res, 1000));
     return mockUser;
@@ -27,6 +29,7 @@ export const fetchUser = createAsyncThunk("user/fetchUser", async () => {
     userId: "123",
     name: "Nick Babineaux",
     email: "nick@xtechnology-usa.com",
+    phoneNumber: "3372579202",
     role: "admin",
     isAuthenticated: true,
     loading: false,
