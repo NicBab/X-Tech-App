@@ -11,9 +11,9 @@ export default function Home() {
 
   useEffect(() => {
     if (role === "admin") {
-      router.push("/admin");
+      router.push("/admin/admin-layout");
     } else if (role === "employee") {
-      router.push("/employee");
+      router.push("/employee.employee-layout");
     } else if (role === null || role === undefined) {
       router.push("/login");
     }
@@ -22,6 +22,7 @@ export default function Home() {
 
   return loading ? <div className="p-8">Redirecting...</div> : null;
 }
+
 
 
 // import Image from "next/image";
