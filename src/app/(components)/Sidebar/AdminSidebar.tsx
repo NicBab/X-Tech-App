@@ -110,62 +110,62 @@ const Sidebar = () => {
       {/* LINKS */}
       <div className="flex-grow mt-8">
         <SidebarLink
-          href="/dashboard"
+          href="/admin/dashboard"
           icon={Layout}
           label="Dashboard"
           isCollapsed={isSidebarCollapsed}
         />
               <SidebarLink
-          href="/TimeEntryForm"
+          href="/admin/TimeEntryForm"
         icon={ClockPlus}
           label="Clock In/Out"
           isCollapsed={isSidebarCollapsed}
         />
             <SidebarLink
-          href=""
+          href="/admin/draftedTimes"
           icon={Archive}
           label="Drafted Times"
           isCollapsed={isSidebarCollapsed}
         />
             <SidebarLink
-          href=""
+          href="/admin/dlrs"
           icon={Clipboard}
           label="DLRs"
           isCollapsed={isSidebarCollapsed}
         />
             <SidebarLink
-          href=""
+          href="/admin/employeeTimes"
           icon={Archive}
           label="Employee Times"
           isCollapsed={isSidebarCollapsed}
         />
 
         <SidebarLink
-          href="/inventory"
+          href="/admin/inventory"
           icon={Archive}
           label="Inventory"
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink
-          href="/products"
+          href="/admin/products"
           icon={Archive}
           label="Products"
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink
-          href="/users"
+          href="/admin/users"
           icon={User}
           label="Users"
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink
-          href="/settings"
+          href="/admin/settings"
           icon={SlidersHorizontal}
           label="Settings"
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink
-          href="/expenses"
+          href="/admin/expenses"
           icon={CircleDollarSign}
           label="Expenses"
           isCollapsed={isSidebarCollapsed}
