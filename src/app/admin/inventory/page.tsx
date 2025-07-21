@@ -6,14 +6,12 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Header from "@/app/(components)/Header";
 import { PlusCircleIcon, SearchIcon } from "lucide-react";
 
-// ✅ Columns with proper type
 const columns: GridColDef<Product>[] = [
   { field: "productId", headerName: "ID", width: 90 },
   {
     field: "mfr",
     headerName: "Manufacturer",
     width: 150,
-    valueGetter: (params) => params.row.mfr ?? "N/A",
   },
   {
     field: "name",
@@ -24,7 +22,6 @@ const columns: GridColDef<Product>[] = [
     field: "sku",
     headerName: "SKU",
     width: 150,
-    valueGetter: (params) => params.row.sku ?? "N/A",
   },
   {
     field: "stockQuantity",
@@ -36,10 +33,8 @@ const columns: GridColDef<Product>[] = [
     field: "price",
     headerName: "Price",
     width: 120,
-    valueGetter: (params) =>
-      typeof params.row.price === "number"
-        ? `$${params.row.price.toFixed(2)}`
-        : "N/A",
+    type: "number",
+    valueFormatter: (value: number) => `$${value.toFixed(2)}`,
   },
 ];
 
@@ -93,16 +88,7 @@ const Inventory = () => {
 
       {/* TABLE */}
       <DataGrid
-        rows={[
-  {
-    productId: "p1",
-    name: "Pump",
-    mfr: "Acme",
-    sku: "P-1001",
-    stockQuantity: 20,
-    price: 100.5,
-  },
-]}
+        rows={products}
         columns={columns}
         getRowId={(row) => row.productId}
         checkboxSelection
