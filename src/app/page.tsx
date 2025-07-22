@@ -12,8 +12,8 @@ export default function Home() {
   useEffect(() => {
     if (role === "admin") {
       router.push("/admin/admin-layout");
-    } else if (role === "employee") {
-      router.push("/employee.employee-layout");
+    } else if (role === "user") {
+      router.push("/employee/employee-layout");
     } else if (role === null || role === undefined) {
       router.push("/login");
     }

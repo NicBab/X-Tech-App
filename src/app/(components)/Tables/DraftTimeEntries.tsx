@@ -45,7 +45,7 @@ export default function DraftTimeEntries() {
     setFilteredEntries(results);
   }, [searchTerm, entries]);
 
-  const handleRowClick = (params: any) => {
+  const handleRowClick = (params: { row: { id: string } }) => {
     router.push(`/employee/draft-times/${params.row.id}`);
   };
 

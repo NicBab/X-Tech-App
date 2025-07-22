@@ -18,7 +18,7 @@ interface DLR {
 }
 
 interface DLRTableProps {
-  role: "admin";
+  role: "admin" | "user";
   currentUserId: string;
 }
 
