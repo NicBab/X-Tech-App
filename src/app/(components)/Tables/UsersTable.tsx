@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Header from "@/app/(components)/Header";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { Trash2Icon, SearchIcon, PlusCircleIcon } from "lucide-react";
@@ -11,42 +11,34 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-
-const mockUsers = [
-  {
-    userId: "u001",
-    name: "Nick Babineaux",
-    email: "nick@xtechnology-usa.com",
-    role: "admin",
-    status: "active",
-  },
-  {
-    userId: "u002",
-    name: "John Smith",
-    email: "john@xtechnology-usa.com",
-    role: "user",
-    status: "inactive",
-  },
-];
+import { useGetUsersQuery, User } from "@/redux/api/api";
 
 export default function UsersTable() {
-  const [rows, setRows] = useState(mockUsers);
-  const [search, setSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const {
+    data: users = [],
+    isLoading,
+    isError,
+  } = useGetUsersQuery(); // Assume server returns all users for now
+
+  const [rows, setRows] = useState<User[]>([]);
 
   useEffect(() => {
-    if (!search) {
-      setRows(mockUsers);
-    } else {
-      const filtered = mockUsers.filter((user) =>
-        Object.values(user).some((value) =>
-          String(value).toLowerCase().includes(search.toLowerCase())
-        )
-      );
-      setRows(filtered);
-    }
-  }, [search]);
+    setRows(users);
+  }, [users]);
+
+  const filteredRows = useMemo(() => {
+    if (!searchTerm.trim()) return rows;
+
+    const term = searchTerm.toLowerCase();
+    return rows.filter((user) =>
+      Object.values(user).some((value) =>
+        String(value).toLowerCase().includes(term)
+      )
+    );
+  }, [rows, searchTerm]);
 
   const handleRoleChange = (id: string, newRole: string) => {
     setRows((prev) =>
@@ -64,6 +56,7 @@ export default function UsersTable() {
     const confirmDelete = confirm("Are you sure you want to delete this user?");
     if (confirmDelete) {
       setRows((prev) => prev.filter((u) => u.userId !== id));
+      // You can also add a mutation to delete user from DB
     }
   };
 
@@ -124,32 +117,47 @@ export default function UsersTable() {
     },
   ];
 
+  if (isLoading) {
+    return <div className="py-4 text-gray-500">Loading...</div>;
+  }
+
+  if (isError) {
+    return (
+      <div className="py-4 text-red-500 text-center">
+        Failed to fetch users.
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full mx-auto p-8 space-y-6 border rounded-xl bg-white shadow-md dark:bg-zinc-900 border-zinc-800 m-20">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+    <div className="flex flex-col">
+      {/* SEARCH */}
+      <div className="mb-6">
+        <div className="flex items-center border-2 border-gray-200 rounded">
+          <SearchIcon className="w-5 h-5 text-gray-500 m-2" />
+          <input
+            className="w-full py-2 px-4 rounded bg-white text-black"
+            placeholder="Search Users..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* HEADER & BUTTON */}
+      <div className="flex justify-between items-center mb-6">
         <Header name="Users" />
-        <Button className="flex items-center space-x-2">
-          <PlusCircleIcon className="w-4 h-4" />
-          <span>Add New User</span>
-        </Button>
+        <button
+          className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={() => setIsModalOpen(true)}
+        >
+          <PlusCircleIcon className="w-5 h-5 mr-2" /> Create User
+        </button>
       </div>
 
-      {/* Search Bar */}
-      <div className="flex items-center border border-gray-300 rounded px-3 py-2 w-full max-w-md">
-        <SearchIcon className="w-5 h-5 text-gray-500 mr-2" />
-        <Input
-          type="text"
-          placeholder="Search by name, email, role, or status..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full border-none focus:outline-none bg-transparent text-sm"
-        />
-      </div>
-
-      {/* Table */}
+      {/* TABLE */}
       <DataGrid
-        rows={rows}
+        rows={filteredRows}
         columns={columns}
         getRowId={(row) => row.userId}
         checkboxSelection
@@ -158,4 +166,4 @@ export default function UsersTable() {
       />
     </div>
   );
-};
+}

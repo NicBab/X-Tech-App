@@ -1,5 +1,11 @@
-export default function AdminDraftedTimesPage() {
+import DraftTimeEntriesTable from "@/app/(components)/Tables/DraftTimeEntriesTable";
+
+export default function DraftedTimes() {
   return (
-    <div className="p-8">Admin Drafted Times - Coming Soon</div>
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+      </div>
+      <DraftTimeEntriesTable />
+    </div>
   );
 }

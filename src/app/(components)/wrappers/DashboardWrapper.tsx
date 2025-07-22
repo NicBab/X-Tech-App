@@ -12,6 +12,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const Sidebar = role === "admin" ? AdminSidebar : EmployeeSidebar;
   const Navbar = role === "admin" ? AdminNavbar : EmployeeNavbar;
+  
 
   return (
     <div className={`${isDark ? "dark" : "light"} flex w-full min-h-screen`}>
