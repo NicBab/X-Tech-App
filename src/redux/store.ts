@@ -1,7 +1,8 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import globalReducer from "./slices/global/GlobalSlice";
 import userReducer from "./slices/user/UserSlice";
-import timeReducer from "./slices/time/TimeSlice"; 
+import timeReducer from "./slices/time/TimeSlice";
+import dlrReducer from "./slices/dlr/DLRSlice";
 import { api } from "./api/api"; // RTK Query api
 import storage from "redux-persist/lib/storage";
 import { persistStore, persistReducer } from "redux-persist";
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   global: globalReducer,
   user: userReducer,
   time: timeReducer,
+  dlr: dlrReducer,
   [api.reducerPath]: api.reducer,
 });
 
