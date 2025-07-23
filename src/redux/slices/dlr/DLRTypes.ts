@@ -1,11 +1,23 @@
 export interface DLR {
-  id: string;
+  dlrId: string;
   dlrNumber: string;
   jobNumber: string;
   date: string;
-  hours: number;
-  customer: string;
-  employeeName: string;
-  status: "Pending" | "Approved" | "Rejected";
   userId: string;
+  customer: string;
+  notes?: string;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "REVIEW";
+  totalHours: number;
+  fuel?: number;
+  hotel?: number;
+  mileage?: number;
+  otherExpenses?: string;
+  fileUrl?: string;
+  signedUrl?: string;
+  createdAt: string;
+  invoiceId?: string;
+  poId?: string;
+  user?: {
+    name: string;
+  };
 }

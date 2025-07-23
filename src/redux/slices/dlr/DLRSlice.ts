@@ -28,7 +28,7 @@ export const DLRSlice = createSlice({
       state.draftDLRs.push(action.payload);
     },
     removeDraftDLR: (state, action: PayloadAction<string>) => {
-      state.draftDLRs = state.draftDLRs.filter((dlr) => dlr.id !== action.payload);
+      state.draftDLRs = state.draftDLRs.filter((dlr) => dlr.dlrId !== action.payload);
     },
     setSubmittedDLRs: (state, action: PayloadAction<DLR[]>) => {
       state.submittedDLRs = action.payload;

@@ -60,12 +60,31 @@ export interface User {
   email: string;
 }
 
+export interface DLR {
+  dlrId: string;
+  jobNumber: string;
+  employeeName: string;
+  date: string;
+  customer: string;
+  status: "Pending" | "Approved" | "Rejected" | "Review";
+  userId: string;
+}
+
+export interface NewDLR {
+  jobNumber: string;
+  employeeName: string;
+  date: string;
+  customer: string;
+  status: "Pending" | "Approved" | "Rejected" | "Review";
+  userId: string;
+}
+
 export const api = createApi({
-  baseQuery: fetchBaseQuery({ 
-    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000" 
+  baseQuery: fetchBaseQuery({
+    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000",
   }),
   reducerPath: "api",
-  tagTypes: ["DashboardMetrics", "Products", "Users", "Expenses"],
+  tagTypes: ["DashboardMetrics", "Products", "Users", "DLRs", "Expenses"],
   endpoints: (build) => ({
     getDashboardMetrics: build.query<DashboardMetrics, void>({
       query: () => "/dashboard",
@@ -89,10 +108,28 @@ export const api = createApi({
     getUsers: build.query<User[], string | void>({
       query: (search) => ({
         url: "/users",
-         params: search ? { search } : {},
+        params: search ? { search } : {},
+      }),
+      providesTags: ["Users"],
     }),
-    providesTags: ["Users"],
-  }),
+
+    getDLRs: build.query<DLR[], string | void>({
+      query: (search) => ({
+        url: "/dlrs",
+        params: search ? { search } : {},
+      }),
+      providesTags: ["DLRs"],
+    }),
+
+    createDLR: build.mutation<DLR, NewDLR>({
+      query: (newDLR) => ({
+        url: "/dlrs",
+        method: "POST",
+        body: newDLR,
+      }),
+      invalidatesTags: ["DLRs"],
+    }),
+
     getExpensesByCategory: build.query<ExpenseByCategorySummary[], void>({
       query: () => "/expenses",
       providesTags: ["Expenses"],
@@ -105,5 +142,7 @@ export const {
   useGetProductsQuery,
   useCreateProductMutation,
   useGetUsersQuery,
+  useGetDLRsQuery,
+  useCreateDLRMutation,
   useGetExpensesByCategoryQuery,
 } = api;
