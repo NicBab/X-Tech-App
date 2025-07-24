@@ -1,5 +1,24 @@
-import DashboardLayout from "@/app/(components)/wrappers/DashboardWrapper";
+"use client";
+
+import { useAppSelector } from "@/redux/hooks";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import DashboardWrapper from "@/app/(components)/wrappers/DashboardWrapper";
 
 export default function EmployeeLayout({ children }: { children: React.ReactNode }) {
-  return <DashboardLayout>{children}</DashboardLayout>;
+   const { role, isAuthenticated } = useAppSelector((state) => state.user);
+  const router = useRouter();
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+    if (hydrated && (!isAuthenticated || role !== "employee")) {
+      router.replace("/login");
+    }
+  }, [role, isAuthenticated, hydrated, router]);
+
+  if (!hydrated || !isAuthenticated || role !== "employee") {
+    return <div className="p-8">Authorization Required...</div>;
+  }
+  return <DashboardWrapper>{children}</DashboardWrapper>;
 }

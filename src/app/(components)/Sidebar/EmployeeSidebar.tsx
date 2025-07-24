@@ -113,7 +113,7 @@ const Sidebar = () => {
       {/* LINKS */}
       <div className="flex-grow mt-8">
         <SidebarLink
-          href="/dashboard"
+          href="/employee/employee-layout"
           icon={Layout}
           label="Dashboard"
           isCollapsed={isSidebarCollapsed}
@@ -137,7 +137,7 @@ const Sidebar = () => {
           isCollapsed={isSidebarCollapsed}
         />
               <SidebarLink
-          href=""
+          href="/employee/time-entry"
           icon={CalendarClock}
           label="Clock In/Out"
           isCollapsed={isSidebarCollapsed}
@@ -155,7 +155,7 @@ const Sidebar = () => {
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink
-          href="/settings"
+          href="/employee/settings"
           icon={SlidersHorizontal}
           label="Settings"
           isCollapsed={isSidebarCollapsed}

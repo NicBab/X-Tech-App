@@ -24,14 +24,14 @@ export default function DLRTable({ role, currentUserId }: DLRTableProps) {
     return matchesUser;
   });
 
-  const columns: GridColDef<DLR>[] = [
+const columns: GridColDef<DLR>[] = [
   { field: "dlrNumber", headerName: "DLR#", width: 120 },
   { field: "jobNumber", headerName: "Job#", width: 120 },
   {
     field: "user",
     headerName: "Employee",
     width: 180,
-    valueGetter: (params) => params.row.user?.name || "N/A", // ✅ this now works
+    valueGetter: (params: { row: DLR }) => params.row.user?.name || "N/A",
   },
   { field: "date", headerName: "Date", width: 140 },
   { field: "customer", headerName: "Customer", width: 120 },
@@ -66,6 +66,7 @@ export default function DLRTable({ role, currentUserId }: DLRTableProps) {
     },
   },
 ];
+
 
   return (
     <div className="flex flex-col">

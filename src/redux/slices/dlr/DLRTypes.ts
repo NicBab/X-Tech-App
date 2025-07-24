@@ -3,7 +3,6 @@ export interface DLR {
   dlrNumber: string;
   jobNumber: string;
   date: string;
-  userId: string;
   customer: string;
   notes?: string;
   status: "PENDING" | "APPROVED" | "REJECTED" | "REVIEW";
@@ -15,6 +14,7 @@ export interface DLR {
   fileUrl?: string;
   signedUrl?: string;
   createdAt: string;
+  userId: string;
   invoiceId?: string;
   poId?: string;
   user?: {

@@ -30,6 +30,7 @@ const userSlice = createSlice({
     },
     setUser: (state, action: PayloadAction<UserState>) => {
       Object.assign(state, action.payload, {
+         role: action.payload.role?.toLowerCase() as "admin" | "employee",
         isAuthenticated: true,
         loading: false,
         error: null,
@@ -44,6 +45,7 @@ const userSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action: PayloadAction<UserState>) => {
         Object.assign(state, action.payload, {
+          role: action.payload.role?.toLowerCase() as "admin" | "employee",
           isAuthenticated: true,
           loading: false,
           error: null,

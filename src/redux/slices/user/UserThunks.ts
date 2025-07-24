@@ -11,7 +11,7 @@ export const loginUser = createAsyncThunk(
       name: "Nick Babineaux",
       email: credentials.email,
       phoneNumber: "",
-      role: credentials.email === "admin@xtechnology-usa.com" ? "admin" : "user",
+      role: credentials.email === "admin@xtechnology-usa.com" ? "admin" : "employee",
       isAuthenticated: true,
       loading: false,
       error: null,

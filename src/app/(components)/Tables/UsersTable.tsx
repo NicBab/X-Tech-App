@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import Header from "@/app/(components)/Header";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Trash2Icon, SearchIcon, PlusCircleIcon } from "lucide-react";
 import {
   Select,
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { useGetUsersQuery, User } from "@/redux/api/api";
 
+
 export default function UsersTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,42 +22,46 @@ export default function UsersTable() {
     data: users = [],
     isLoading,
     isError,
-  } = useGetUsersQuery(); // Assume server returns all users for now
+  } = useGetUsersQuery();
 
-  const [rows, setRows] = useState<User[]>([]);
+  const [localUsers, setLocalUsers] = useState<User[]>([]);
 
-  useEffect(() => {
-    setRows(users);
+  // First-time copy: only if local is empty and users fetched
+  useMemo(() => {
+    if (localUsers.length === 0 && users.length > 0) {
+      setLocalUsers(users);
+    }
   }, [users]);
 
-  const filteredRows = useMemo(() => {
-    if (!searchTerm.trim()) return rows;
-
+  const filteredUsers = useMemo(() => {
     const term = searchTerm.toLowerCase();
-    return rows.filter((user) =>
-      Object.values(user).some((value) =>
-        String(value).toLowerCase().includes(term)
-      )
+    return localUsers.filter((user) =>
+      [user.name, user.email, user.role, user.status]
+       .some((field) => (field ?? "").toLowerCase().includes(term))
     );
-  }, [rows, searchTerm]);
+  }, [searchTerm, localUsers]);
 
-  const handleRoleChange = (id: string, newRole: string) => {
-    setRows((prev) =>
-      prev.map((u) => (u.userId === id ? { ...u, role: newRole } : u))
-    );
-  };
+const handleRoleChange = (userId: string, newRole: "admin" | "employee") => {
+  setLocalUsers((prev) =>
+    prev.map((u) =>
+      u.userId === userId ? { ...u, role: newRole } : u
+    )
+  );
+};
 
-  const handleStatusChange = (id: string, newStatus: string) => {
-    setRows((prev) =>
-      prev.map((u) => (u.userId === id ? { ...u, status: newStatus } : u))
-    );
-  };
+const handleStatusChange = (userId: string, newStatus: "active" | "inactive") => {
+  setLocalUsers((prev) =>
+    prev.map((u) =>
+      u.userId === userId ? { ...u, status: newStatus } : u
+    )
+  );
+};
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (userId: string) => {
     const confirmDelete = confirm("Are you sure you want to delete this user?");
     if (confirmDelete) {
-      setRows((prev) => prev.filter((u) => u.userId !== id));
-      // You can also add a mutation to delete user from DB
+      setLocalUsers((prev) => prev.filter((u) => u.userId !== userId));
+      // Optional: call mutation to delete from DB
     }
   };
 
@@ -68,12 +73,12 @@ export default function UsersTable() {
       field: "role",
       headerName: "Role",
       width: 160,
-      renderCell: (params: GridRenderCellParams) => (
+      renderCell: (params) => (
         <Select
           defaultValue={params.row.role}
-          onValueChange={(val) => handleRoleChange(params.row.userId, val)}
+          onValueChange={(val) => handleRoleChange(params.row.userId, val as "admin" | "user")}
         >
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[120px] mt-2">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -87,12 +92,12 @@ export default function UsersTable() {
       field: "status",
       headerName: "Status",
       width: 160,
-      renderCell: (params: GridRenderCellParams) => (
+      renderCell: (params) => (
         <Select
           defaultValue={params.row.status}
-          onValueChange={(val) => handleStatusChange(params.row.userId, val)}
+          onValueChange={(val) => handleStatusChange(params.row.userId, val as "active" | "inactive")}
         >
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[120px] mt-2">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -106,7 +111,7 @@ export default function UsersTable() {
       field: "actions",
       headerName: "Actions",
       width: 100,
-      renderCell: (params: GridRenderCellParams) => (
+      renderCell: (params) => (
         <button
           onClick={() => handleDelete(params.row.userId)}
           className="text-red-500 hover:text-red-700"
@@ -117,17 +122,8 @@ export default function UsersTable() {
     },
   ];
 
-  if (isLoading) {
-    return <div className="py-4 text-gray-500">Loading...</div>;
-  }
-
-  if (isError) {
-    return (
-      <div className="py-4 text-red-500 text-center">
-        Failed to fetch users.
-      </div>
-    );
-  }
+  if (isLoading) return <p className="text-gray-500">Loading...</p>;
+  if (isError) return <p className="text-red-500">Error loading users.</p>;
 
   return (
     <div className="flex flex-col">
@@ -144,7 +140,7 @@ export default function UsersTable() {
         </div>
       </div>
 
-      {/* HEADER & BUTTON */}
+      {/* HEADER + BUTTON */}
       <div className="flex justify-between items-center mb-6">
         <Header name="Users" />
         <button
@@ -157,12 +153,12 @@ export default function UsersTable() {
 
       {/* TABLE */}
       <DataGrid
-        rows={filteredRows}
+        rows={filteredUsers}
         columns={columns}
         getRowId={(row) => row.userId}
         checkboxSelection
         autoHeight
-        className="h-[400px] w-[100%] bg-white shadow rounded-lg border border-gray-200 !text-gray-700 dark:bg-zinc-900 dark:!text-gray-300"
+        className="bg-white shadow rounded-lg border border-gray-200 !text-gray-700 dark:bg-zinc-900 dark:!text-gray-300"
       />
     </div>
   );

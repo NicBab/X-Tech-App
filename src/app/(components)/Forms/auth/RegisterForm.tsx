@@ -68,9 +68,9 @@ export default function RegisterPage() {
       );
 
       if (data.user.role.toLowerCase() === "admin") {
-        router.push("/admin/admin-dashboard");
+        router.push("/admin/admin-layout");
       } else {
-        router.push("/employee/employee-dashboard");
+        router.push("/employee/employee-layout");
       }
     } catch (err) {
       console.error("Registration error:", err);

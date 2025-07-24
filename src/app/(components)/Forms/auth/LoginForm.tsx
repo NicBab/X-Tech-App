@@ -52,7 +52,7 @@ export default function LoginPage() {
     if (data.user.role.toLowerCase() === "admin") {
       router.push("/admin/admin-layout");
     } else {
-      router.push("/employee-layout");
+      router.push("/employee/employee-layout");
     }
   };
 

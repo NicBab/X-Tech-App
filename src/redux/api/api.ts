@@ -1,5 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { DLR } from "@/redux/slices/dlr/DLRTypes"
+import { BaseUser } from "@/redux/slices/user/UserTypes";
 
+export type User = BaseUser;
 export interface Product {
   productId: string;
   mfr: string;
@@ -54,21 +57,21 @@ export interface DashboardMetrics {
   expenseByCategorySummary: ExpenseByCategorySummary[];
 }
 
-export interface User {
-  userId: string;
-  name: string;
-  email: string;
-}
+// export interface User {
+//   userId: string;
+//   name: string;
+//   email: string;
+// }
 
-export interface DLR {
-  dlrId: string;
-  jobNumber: string;
-  employeeName: string;
-  date: string;
-  customer: string;
-  status: "Pending" | "Approved" | "Rejected" | "Review";
-  userId: string;
-}
+// export interface DLR {
+//   dlrId: string;
+//   jobNumber: string;
+//   employeeName: string;
+//   date: string;
+//   customer: string;
+//   status: "Pending" | "Approved" | "Rejected" | "Review";
+//   userId: string;
+// }
 
 export interface NewDLR {
   jobNumber: string;
@@ -113,7 +116,7 @@ export const api = createApi({
       providesTags: ["Users"],
     }),
 
-    getDLRs: build.query<DLR[], string | void>({
+   getDLRs: build.query<DLR[], string | void>({
       query: (search) => ({
         url: "/dlrs",
         params: search ? { search } : {},
