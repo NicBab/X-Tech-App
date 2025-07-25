@@ -1,7 +1,7 @@
 "use client";
 
-import { useAppDispatch, useAppSelector } from "@/redux/hooks"
-import { setIsSidebarCollapsed } from "@/redux/slices/global/GlobalSlice"
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { setIsSidebarCollapsed } from "@/redux/slices/global/GlobalSlice";
 import {
   Archive,
   CircleDollarSign,
@@ -16,7 +16,7 @@ import {
   ClipboardPenLine,
   ClipboardCheck,
   AlarmClockCheck,
-  AlarmClockPlus
+  AlarmClockPlus,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -118,38 +118,38 @@ const Sidebar = () => {
           label="Dashboard"
           isCollapsed={isSidebarCollapsed}
         />
-                   <SidebarLink
-          href=""
+        <SidebarLink
+          href="/employee/new-dlr"
           icon={Clipboard}
           label="New DLR"
           isCollapsed={isSidebarCollapsed}
         />
-                       <SidebarLink
-          href=""
+        <SidebarLink
+          href="/employee/drafted-dlrs"
           icon={ClipboardPenLine}
           label="Drafted DLRs"
           isCollapsed={isSidebarCollapsed}
         />
-                          <SidebarLink
-          href=""
+        <SidebarLink
+          href="/employee/submitted-dlrs"
           icon={ClipboardCheck}
           label="Submitted DLRs"
           isCollapsed={isSidebarCollapsed}
         />
-              <SidebarLink
+        <SidebarLink
           href="/employee/time-entry"
           icon={CalendarClock}
           label="Clock In/Out"
           isCollapsed={isSidebarCollapsed}
         />
-            <SidebarLink
-          href=""
+        <SidebarLink
+          href="/employee/drafted-times"
           icon={AlarmClockPlus}
           label="Drafted Times"
           isCollapsed={isSidebarCollapsed}
         />
-            <SidebarLink
-          href=""
+        <SidebarLink
+          href="/employee/submitted-times"
           icon={AlarmClockCheck}
           label="Submitted Times"
           isCollapsed={isSidebarCollapsed}
@@ -160,7 +160,6 @@ const Sidebar = () => {
           label="Settings"
           isCollapsed={isSidebarCollapsed}
         />
-  
       </div>
 
       {/* FOOTER */}
