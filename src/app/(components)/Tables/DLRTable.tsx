@@ -76,7 +76,7 @@ const columns: GridColDef<DLR>[] = [
           <SearchIcon className="w-5 h-5 text-gray-500 m-2" />
           <input
             className="w-full py-2 px-4 rounded bg-white text-black"
-            placeholder="Search DLRs..."
+            placeholder="Search Submitted DLRs..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -85,7 +85,7 @@ const columns: GridColDef<DLR>[] = [
 
       {/* HEADER & BUTTON */}
       <div className="flex justify-between items-center mb-6">
-        <Header name="DLRs" />
+        <Header name="Submitted DLRs" />
         <button
           className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           onClick={() => setIsModalOpen(true)}

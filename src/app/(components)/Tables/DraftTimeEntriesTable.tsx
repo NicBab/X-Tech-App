@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2Icon, SearchIcon } from "lucide-react";
+import { Trash2Icon, SearchIcon, PlusCircleIcon } from "lucide-react";
 import Header from "@/app/(components)/Header";
 
 // Sample mock data for draft entries
@@ -34,6 +34,7 @@ export default function DraftTimeEntries() {
   const [entries, setEntries] = useState(initialDraftTimeEntries);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredEntries, setFilteredEntries] = useState(entries);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const results = entries.filter(
@@ -85,25 +86,29 @@ export default function DraftTimeEntries() {
   ];
 
   return (
-    <div className="w-full mx-auto p-8 space-y-6 border rounded-xl bg-white shadow-md dark:bg-zinc-900 border-zinc-800 m-20">
-      {/* Header + New Button */}
-      <div className="flex justify-between items-center">
-        <Header name="Drafted Time Entries" />
-        <Button onClick={() => router.push("/employee/time-entry")}>
-          New Time Entry
-        </Button>
+    <div className="flex flex-col">
+      {/* SEARCH */}
+      <div className="mb-6">
+        <div className="flex items-center border-2 border-gray-200 rounded">
+          <SearchIcon className="w-5 h-5 text-gray-500 m-2" />
+          <input
+            className="w-full py-2 px-4 rounded bg-white text-black"
+            placeholder="Search Drafted Times..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="flex items-center border border-gray-300 rounded px-3 py-2 max-w-md mb-2">
-        <SearchIcon className="w-5 h-5 text-gray-500 mr-2" />
-        <Input
-          type="text"
-          placeholder="Search by ID, name, or status..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full border-none bg-transparent text-sm focus:outline-none"
-        />
+      {/* HEADER & BUTTON */}
+      <div className="flex justify-between items-center mb-6">
+        <Header name="Drafted Times" />
+        <button
+          className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={() => setIsModalOpen(true)}
+        >
+          <PlusCircleIcon className="w-5 h-5 mr-2" /> Create DLR
+        </button>
       </div>
 
       {/* Data Table */}

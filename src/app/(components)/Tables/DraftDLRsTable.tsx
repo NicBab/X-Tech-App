@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useRouter } from "next/navigation";
-import { SearchIcon, Trash2Icon, PlusCircle } from "lucide-react";
+import { SearchIcon, Trash2Icon, PlusCircleIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import Header from "@/app/(components)/Header";
 
 interface DraftDLR {
@@ -17,6 +16,12 @@ interface DraftDLR {
   userId: string;
 }
 
+interface DraftDLRTableProps {
+  role: "admin" | "user";
+  currentUserId: string;
+}
+
+// Replace this with API or Redux data later
 const mockDLRs: DraftDLR[] = [
   {
     id: "1",
@@ -34,34 +39,37 @@ const mockDLRs: DraftDLR[] = [
     hours: 6,
     userId: "user-123",
   },
+  {
+    id: "3",
+    dlrNumber: "DLR-003",
+    jobNumber: "XT-2025-047",
+    date: "2025-07-10",
+    hours: 5,
+    userId: "user-456",
+  },
 ];
 
-export default function DraftDLRsTable() {
+export default function DraftDLRsTable({ role, currentUserId }: DraftDLRTableProps) {
   const router = useRouter();
-  const [search, setSearch] = useState("");
-  const [filtered, setFiltered] = useState<DraftDLR[]>([]);
-  const loggedInUserId = "user-123"; // Replace with Redux/Auth context
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    const userDrafts = mockDLRs.filter((dlr) => dlr.userId === loggedInUserId);
-    setFiltered(userDrafts);
-  }, []);
-
-  useEffect(() => {
-    const results = mockDLRs.filter(
-      (dlr) =>
-        dlr.userId === loggedInUserId &&
-        (dlr.dlrNumber.toLowerCase().includes(search.toLowerCase()) ||
-          dlr.jobNumber.toLowerCase().includes(search.toLowerCase()))
-    );
-    setFiltered(results);
-  }, [search]);
+  const filteredDLRs = useMemo(() => {
+    return mockDLRs.filter((dlr) => {
+      const matchesUser = role === "admin" || dlr.userId === currentUserId;
+      const matchesSearch =
+        dlr.dlrNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        dlr.jobNumber.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesUser && matchesSearch;
+    });
+  }, [searchTerm, currentUserId, role]);
 
   const handleDelete = (id: string) => {
-    setFiltered((prev) => prev.filter((dlr) => dlr.id !== id));
+    // Replace with backend logic later
+    console.log(`Delete draft DLR ${id}`);
   };
 
-  const columns: GridColDef[] = [
+  const columns: GridColDef<DraftDLR>[] = [
     { field: "dlrNumber", headerName: "DLR#", width: 120 },
     { field: "jobNumber", headerName: "Job#", width: 120 },
     { field: "date", headerName: "Date", width: 140 },
@@ -86,34 +94,42 @@ export default function DraftDLRsTable() {
   ];
 
   return (
-    <Card className="mx-auto p-8 space-y-6 border rounded-xl bg-white shadow-md dark:bg-zinc-900 border-zinc-800 m-20">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col">
+       {/* SEARCH */}
+      <div className="mb-6">
+        <div className="flex items-center border-2 border-gray-200 rounded">
+          <SearchIcon className="w-5 h-5 text-gray-500 m-2" />
+          <input
+            className="w-full py-2 px-4 rounded bg-white text-black"
+            placeholder="Search drafted DLRs..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* HEADER & BUTTON */}
+      <div className="flex justify-between items-center">
         <Header name="Drafted DLRs" />
-        <Button onClick={() => router.push("/employee/new-dlr")}>
-          <PlusCircle className="w-5 h-5 mr-2" />
-          New DLR
-        </Button>
+        <button
+          className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={() => setIsModalOpen(true)}
+        >
+          <PlusCircleIcon className="w-5 h-5 mr-2" /> Create DLR
+        </button>
       </div>
 
-      <div className="flex items-center border border-gray-300 rounded mt-4">
-        <SearchIcon className="w-5 h-5 text-gray-500 m-2" />
-        <input
-          className="w-full py-2 px-4 bg-white"
-          placeholder="Search by DLR# or Job#..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
-
+      {/* TABLE */}
       <DataGrid
-        rows={filtered}
+        rows={filteredDLRs}
         columns={columns}
         getRowId={(row) => row.id}
-        className="bg-white shadow rounded-lg border border-gray-200 !text-gray-700"
+        autoHeight
+        className="bg-white shadow rounded-lg border border-gray-200 !text-gray-700 mt-6 dark:bg-zinc-900 dark:!text-gray-300"
         onRowClick={(params) =>
           router.push(`/employee/draft-dlrs/${params.id}`)
         }
       />
-    </Card>
+    </div>
   );
-};
+}
