@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Header from "@/app/(components)/Header";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { Trash2Icon, SearchIcon, PlusCircleIcon } from "lucide-react";
 import {
   Select,
@@ -65,7 +65,7 @@ const handleStatusChange = (userId: string, newStatus: "active" | "inactive") =>
     }
   };
 
-  const columns: GridColDef[] = [
+  const columns: GridColDef<User>[] = [
     { field: "userId", headerName: "ID", width: 90 },
     { field: "name", headerName: "Name", width: 200 },
     { field: "email", headerName: "Email", width: 230 },
@@ -73,17 +73,17 @@ const handleStatusChange = (userId: string, newStatus: "active" | "inactive") =>
       field: "role",
       headerName: "Role",
       width: 160,
-      renderCell: (params) => (
+      renderCell: (params: GridRenderCellParams<User>) => (
         <Select
-          defaultValue={params.row.role}
-          onValueChange={(val) => handleRoleChange(params.row.userId, val as "admin" | "user")}
+          defaultValue={params?.row?.role}
+          onValueChange={(val) => handleRoleChange(params?.row?.userId, val as "admin" | "employee")}
         >
           <SelectTrigger className="w-[120px] mt-2">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="user">User</SelectItem>
+            <SelectItem value="employee">Employee</SelectItem>
           </SelectContent>
         </Select>
       ),
@@ -92,10 +92,10 @@ const handleStatusChange = (userId: string, newStatus: "active" | "inactive") =>
       field: "status",
       headerName: "Status",
       width: 160,
-      renderCell: (params) => (
+      renderCell: (params: GridRenderCellParams<User>) => (
         <Select
-          defaultValue={params.row.status}
-          onValueChange={(val) => handleStatusChange(params.row.userId, val as "active" | "inactive")}
+          defaultValue={params?.row?.status}
+          onValueChange={(val) => handleStatusChange(params?.row?.userId, val as "active" | "inactive")}
         >
           <SelectTrigger className="w-[120px] mt-2">
             <SelectValue />
@@ -111,9 +111,9 @@ const handleStatusChange = (userId: string, newStatus: "active" | "inactive") =>
       field: "actions",
       headerName: "Actions",
       width: 100,
-      renderCell: (params) => (
+      renderCell: (params: GridRenderCellParams<User>) => (
         <button
-          onClick={() => handleDelete(params.row.userId)}
+          onClick={() => handleDelete(params?.row?.userId)}
           className="text-red-500 hover:text-red-700"
         >
           <Trash2Icon className="w-5 h-5" />
