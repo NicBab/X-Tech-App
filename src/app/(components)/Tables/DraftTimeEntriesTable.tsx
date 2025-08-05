@@ -42,27 +42,27 @@ export default function DraftTimeEntriesTable() {
       field: "employeeName",
       headerName: "Employee",
       width: 180,
-      valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) => params?.row?.user?.name ?? "N/A",
+      valueGetter: (value, row: TimeEntryGroup) => row?.user?.name ?? "N/A",
     },
     {
       field: "date",
       headerName: "Date",
       width: 140,
-      valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) =>
-        params?.row?.date ? format(new Date(params.row.date), "yyyy-MM-dd") : "N/A",
+      valueGetter: (value, row: TimeEntryGroup) =>
+        row?.date ? format(new Date(row.date), "yyyy-MM-dd") : "N/A",
     },
     {
       field: "jobCount",
       headerName: "Jobs",
       width: 100,
-      valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) => params?.row?.jobs?.length ?? 0,
+      valueGetter: (value, row: TimeEntryGroup) => row?.jobs?.length ?? 0,
     },
     {
       field: "totalHours",
       headerName: "Total Hours",
       width: 140,
-      valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) =>
-        params?.row?.jobs?.reduce((sum, job) => sum + job.hoursWorked, 0) ?? 0,
+      valueGetter: (value, row: TimeEntryGroup) =>
+        row?.jobs?.reduce((sum, job) => sum + job.hoursWorked, 0) ?? 0,
     },
     { field: "status", headerName: "Status", width: 120 },
     {
