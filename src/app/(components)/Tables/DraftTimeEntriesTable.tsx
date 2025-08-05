@@ -22,7 +22,8 @@ export default function DraftTimeEntriesTable() {
     isError,
   } = useGetTimeEntriesQuery({
   userId: userId ?? "",
-  role: role ?? "employee", // or "admin" if that's the default
+  role: role ?? "employee",
+  status: "DRAFT",
 });
 
   const filteredEntries: TimeEntryGroup[] = useMemo(() => {
@@ -41,14 +42,15 @@ export default function DraftTimeEntriesTable() {
       field: "employeeName",
       headerName: "Employee",
       width: 180,
-      valueGetter: (params: { row: TimeEntryGroup }) => params.row.user?.name ?? "N/A",
+      valueGetter: (params: { row: TimeEntryGroup }) =>
+        params.row.user?.name ?? "N/A",
     },
     {
       field: "date",
       headerName: "Date",
       width: 140,
       valueGetter: (params: { row: TimeEntryGroup }) =>
-  format(new Date(params.row.date), "yyyy-MM-dd"),
+        format(new Date(params.row.date), "yyyy-MM-dd"),
     },
     {
       field: "jobCount",
@@ -60,8 +62,8 @@ export default function DraftTimeEntriesTable() {
       field: "totalHours",
       headerName: "Total Hours",
       width: 140,
-     valueGetter: (params: { row: TimeEntryGroup }) =>
-  params.row.jobs?.reduce((sum, job) => sum + job.hoursWorked, 0) ?? 0,
+      valueGetter: (params: { row: TimeEntryGroup }) =>
+        params.row.jobs?.reduce((sum, job) => sum + job.hoursWorked, 0) ?? 0,
     },
     { field: "status", headerName: "Status", width: 120 },
     {
@@ -115,24 +117,26 @@ export default function DraftTimeEntriesTable() {
         rows={filteredEntries}
         columns={columns}
         getRowId={(row) => row.id}
-        onRowClick={(params) => router.push(`/employee/draft-times/${params.row.id}`)}
+        onRowClick={(params) =>
+          router.push(`/employee/draft-times/${params.row.id}`)
+        }
         className="bg-white shadow rounded-lg border border-gray-200 !text-gray-700 dark:bg-zinc-900 dark:!text-gray-300"
         autoHeight
         loading={isLoading}
       />
 
       {isError ? (
-  <p className="text-red-500 mt-4 text-sm text-center">
-    Failed to load time entries.
-  </p>
-) : (
-  !isLoading &&
-  filteredEntries.length === 0 && (
-    <p className="text-gray-500 mt-4 text-sm text-center">
-      No draft time entries found.
-    </p>
-  )
-)}
+        <p className="text-red-500 mt-4 text-sm text-center">
+          Failed to load time entries.
+        </p>
+      ) : (
+        !isLoading &&
+        filteredEntries.length === 0 && (
+          <p className="text-gray-500 mt-4 text-sm text-center">
+            No draft time entries found.
+          </p>
+        )
+      )}
     </div>
   );
 }

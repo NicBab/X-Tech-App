@@ -134,13 +134,11 @@ export const api = createApi({
       invalidatesTags: ["DLRs"],
     }),
 
-getTimeEntries: build.query<TimeEntryGroup[], { userId: string; role: string }>({
-  query: ({ userId, role }) => {
-    const params = new URLSearchParams();
-    params.append("userId", userId);
-    params.append("role", role);
-    return `/api/times?${params.toString()}`;
-  },
+getTimeEntries: build.query<TimeEntryGroup[], { userId: string; role: string; status?: string }>({
+  query: ({ userId, role, status }) => ({
+    url: "/times",
+    params: { userId, role, ...(status && { status }) },
+  }),
 }),
 
     getExpensesByCategory: build.query<ExpenseByCategorySummary[], void>({

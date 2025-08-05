@@ -134,7 +134,7 @@ const Sidebar = () => {
           isCollapsed={isSidebarCollapsed}
         />
             <SidebarLink
-          href="/admin/employeeTimes"
+          href="/admin/employee-times"
           icon={Archive}
           label="Employee Times"
           isCollapsed={isSidebarCollapsed}
