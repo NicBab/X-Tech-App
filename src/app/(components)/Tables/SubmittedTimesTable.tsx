@@ -44,33 +44,33 @@ export default function SubmittedTimesTable() {
       field: "user",
       headerName: "Employee",
       width: 180,
-      valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) =>
-        params?.row?.user?.name ?? "N/A",
+      valueGetter: (value, row: TimeEntryGroup) =>
+        row?.user?.name ?? "N/A",
     },
     {
       field: "date",
       headerName: "Date",
       width: 140,
-      valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) =>
-        params?.row?.date
-          ? format(new Date(params.row.date), "yyyy-MM-dd")
+      valueGetter: (value, row: TimeEntryGroup) =>
+        row?.date
+          ? format(new Date(row.date), "yyyy-MM-dd")
           : "N/A",
     },
     {
       field: "weekEndingDate",
       headerName: "Week Ending",
       width: 140,
-      valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) =>
-        params?.row?.weekEndingDate
-          ? format(new Date(params.row.weekEndingDate), "yyyy-MM-dd")
+      valueGetter: (value, row: TimeEntryGroup) =>
+        row?.weekEndingDate
+          ? format(new Date(row.weekEndingDate), "yyyy-MM-dd")
           : "N/A",
     },
     {
       field: "totalHours",
       headerName: "Total Hours",
       width: 140,
-      valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) =>
-        params?.row?.jobs?.reduce(
+      valueGetter: (value, row: TimeEntryGroup) =>
+        row?.jobs?.reduce(
           (sum: number, job: TimeEntryJob) => sum + job.hoursWorked,
           0
         ) ?? 0,
@@ -79,8 +79,8 @@ export default function SubmittedTimesTable() {
       field: "status",
       headerName: "Status",
       width: 120,
-      valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) =>
-        params?.row?.status ?? "Unknown",
+      valueGetter: (value, row: TimeEntryGroup) =>
+        row?.status ?? "Unknown",
     },
   ];
 
