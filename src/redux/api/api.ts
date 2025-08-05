@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { DLR } from "@/redux/slices/dlr/DLRTypes"
 import { BaseUser } from "@/redux/slices/user/UserTypes";
+import { TimeEntryGroup } from "../slices/time/TimeTypes";
 
 export type User = BaseUser;
 export interface Product {
@@ -133,6 +134,15 @@ export const api = createApi({
       invalidatesTags: ["DLRs"],
     }),
 
+getTimeEntries: build.query<TimeEntryGroup[], { userId: string; role: string }>({
+  query: ({ userId, role }) => {
+    const params = new URLSearchParams();
+    params.append("userId", userId);
+    params.append("role", role);
+    return `/api/times?${params.toString()}`;
+  },
+}),
+
     getExpensesByCategory: build.query<ExpenseByCategorySummary[], void>({
       query: () => "/expenses",
       providesTags: ["Expenses"],
@@ -147,5 +157,6 @@ export const {
   useGetUsersQuery,
   useGetDLRsQuery,
   useCreateDLRMutation,
+  useGetTimeEntriesQuery,
   useGetExpensesByCategoryQuery,
 } = api;

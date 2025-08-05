@@ -130,6 +130,7 @@ export default function DraftDLRsTable({ role, currentUserId }: DraftDLRTablePro
           router.push(`/employee/draft-dlrs/${params.id}`)
         }
       />
+      
     </div>
   );
 }

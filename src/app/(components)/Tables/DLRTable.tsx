@@ -31,7 +31,7 @@ const columns: GridColDef<DLR>[] = [
     field: "user",
     headerName: "Employee",
     width: 180,
-    valueGetter: (params: { row: DLR }) => params.row.user?.name || "N/A",
+    valueGetter: (params: GridRenderCellParams<DLR>) => params.row?.user?.name ?? "N/A",
   },
   { field: "date", headerName: "Date", width: 140 },
   { field: "customer", headerName: "Customer", width: 120 },

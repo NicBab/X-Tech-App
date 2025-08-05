@@ -1,25 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-export interface JobEntry {
-  jobNumber: string;
-  hours: number;
-  notes?: string;
-  miles?: number;
-  expenses?: number;
-}
-
-export interface TimeEntry {
-  id: string;
-  userId: string;
-  date: string;
-  weekEnding: string;
-  jobs: JobEntry[];
-  totalHours: number;
-  status: "draft" | "submitted";
-}
+import { TimeEntryGroup } from "./TimeTypes";
 
 interface TimeState {
-  entries: TimeEntry[];
+  entries: TimeEntryGroup[];
 }
 
 const initialState: TimeState = {
@@ -30,10 +13,13 @@ const TimeSlice = createSlice({
   name: "time",
   initialState,
   reducers: {
-    addTimeEntry: (state, action: PayloadAction<TimeEntry>) => {
+    setTimeEntries: (state, action: PayloadAction<TimeEntryGroup[]>) => {
+      state.entries = action.payload;
+    },
+    addTimeEntry: (state, action: PayloadAction<TimeEntryGroup>) => {
       state.entries.push(action.payload);
     },
-    updateTimeEntry: (state, action: PayloadAction<TimeEntry>) => {
+    updateTimeEntry: (state, action: PayloadAction<TimeEntryGroup>) => {
       const index = state.entries.findIndex((e) => e.id === action.payload.id);
       if (index !== -1) {
         state.entries[index] = action.payload;
@@ -49,6 +35,7 @@ const TimeSlice = createSlice({
 });
 
 export const {
+  setTimeEntries,
   addTimeEntry,
   updateTimeEntry,
   deleteTimeEntry,

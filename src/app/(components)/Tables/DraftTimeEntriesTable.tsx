@@ -1,70 +1,68 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useGetTimeEntriesQuery } from "@/redux/api/api"; // must already be defined
+import { TimeEntryGroup } from "@/redux/slices/time/TimeTypes";
 import { Trash2Icon, SearchIcon, PlusCircleIcon } from "lucide-react";
 import Header from "@/app/(components)/Header";
 
-// Sample mock data for draft entries
-const initialDraftTimeEntries = [
-  {
-    id: "entry-001",
-    employeeName: "Nick Babineaux",
-    date: "2025-07-07",
-    jobCount: 2,
-    totalHours: 10.5,
-    status: "Draft",
-  },
-  {
-    id: "entry-002",
-    employeeName: "Nick Babineaux",
-    date: "2025-07-08",
-    jobCount: 1,
-    totalHours: 8.0,
-    status: "Draft",
-  },
-];
-
-export default function DraftTimeEntries() {
+export default function DraftTimeEntriesTable() {
+  const { userId, role } = useSelector((state: RootState) => state.user);
   const router = useRouter();
-  const [entries, setEntries] = useState(initialDraftTimeEntries);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredEntries, setFilteredEntries] = useState(entries);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    const results = entries.filter(
-      (entry) =>
-        entry.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        entry.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        entry.status.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredEntries(results);
-  }, [searchTerm, entries]);
+  const {
+    data: entries = [],
+    isLoading,
+    isError,
+  } = useGetTimeEntriesQuery({
+  userId: userId ?? "",
+  role: role ?? "employee", // or "admin" if that's the default
+});
 
-  const handleRowClick = (params: { row: { id: string } }) => {
-    router.push(`/employee/draft-times/${params.row.id}`);
-  };
-
-  const handleDelete = (id: string) => {
-    setEntries((prev) => prev.filter((entry) => entry.id !== id));
-  };
+  const filteredEntries: TimeEntryGroup[] = useMemo(() => {
+    return entries
+      .filter((entry) => entry.status === "DRAFT" && entry.userId === userId)
+      .filter(
+        (entry) =>
+          entry.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          entry.user?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+  }, [entries, userId, searchTerm]);
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "Entry ID", width: 140 },
-    { field: "employeeName", headerName: "Employee", width: 180 },
+    { field: "id", headerName: "Entry ID", width: 160 },
+    {
+      field: "employeeName",
+      headerName: "Employee",
+      width: 180,
+      valueGetter: (params: { row: TimeEntryGroup }) => params.row.user?.name ?? "N/A",
+    },
     {
       field: "date",
       headerName: "Date",
       width: 140,
-      valueGetter: (value) => format(new Date(value), "yyyy-MM-dd"),
+      valueGetter: (params: { row: TimeEntryGroup }) =>
+  format(new Date(params.row.date), "yyyy-MM-dd"),
     },
-    { field: "jobCount", headerName: "Jobs", width: 100 },
-    { field: "totalHours", headerName: "Total Hours", width: 140 },
+    {
+      field: "jobCount",
+      headerName: "Jobs",
+      width: 100,
+      valueGetter: (params: { row: TimeEntryGroup }) => params.row.jobs.length,
+    },
+    {
+      field: "totalHours",
+      headerName: "Total Hours",
+      width: 140,
+     valueGetter: (params: { row: TimeEntryGroup }) =>
+  params.row.jobs?.reduce((sum, job) => sum + job.hoursWorked, 0) ?? 0,
+    },
     { field: "status", headerName: "Status", width: 120 },
     {
       field: "actions",
@@ -75,7 +73,8 @@ export default function DraftTimeEntries() {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            handleDelete(params.row.id);
+            // You can wire this up with a future deleteTimeEntry mutation
+            console.log("Delete entry ID:", params.row.id);
           }}
           className="text-red-600 hover:text-red-800"
         >
@@ -105,21 +104,35 @@ export default function DraftTimeEntries() {
         <Header name="Drafted Times" />
         <button
           className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => router.push("/employee/new-time-entry")}
         >
-          <PlusCircleIcon className="w-5 h-5 mr-2" /> Create DLR
+          <PlusCircleIcon className="w-5 h-5 mr-2" /> Create Entry
         </button>
       </div>
 
-      {/* Data Table */}
+      {/* TABLE */}
       <DataGrid
         rows={filteredEntries}
         columns={columns}
         getRowId={(row) => row.id}
-        onRowClick={handleRowClick}
+        onRowClick={(params) => router.push(`/employee/draft-times/${params.row.id}`)}
         className="bg-white shadow rounded-lg border border-gray-200 !text-gray-700 dark:bg-zinc-900 dark:!text-gray-300"
         autoHeight
+        loading={isLoading}
       />
+
+      {isError ? (
+  <p className="text-red-500 mt-4 text-sm text-center">
+    Failed to load time entries.
+  </p>
+) : (
+  !isLoading &&
+  filteredEntries.length === 0 && (
+    <p className="text-gray-500 mt-4 text-sm text-center">
+      No draft time entries found.
+    </p>
+  )
+)}
     </div>
   );
 }

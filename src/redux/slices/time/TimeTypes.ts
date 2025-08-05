@@ -1,17 +1,22 @@
-export interface JobEntry {
+export interface TimeEntryJob {
+  id: string;
+  groupId: string;
   jobNumber: string;
-  hours: number;
-  notes?: string;
-  miles?: number;
-  expenses?: number;
+  hoursWorked: number;
+  comments?: string;
+  mileage?: number;
+  extraExpenses?: string;
 }
 
-export interface TimeEntry {
+export interface TimeEntryGroup {
   id: string;
   userId: string;
-  date: string;
-  weekEnding: string;
-  jobs: JobEntry[];
-  totalHours: number;
-  status: "draft" | "submitted";
+  date: string; // or Date, depending on usage
+  weekEndingDate: string;
+  status: "DRAFT" | "SUBMITTED";
+  notes?: string;
+  jobs: TimeEntryJob[];
+  user?: {
+    name: string;
+  };
 }
