@@ -45,14 +45,14 @@ export default function SubmittedTimesTable() {
       headerName: "Employee",
       width: 180,
       valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) =>
-        params.row?.user?.name ?? "N/A",
+        params?.row?.user?.name ?? "N/A",
     },
     {
       field: "date",
       headerName: "Date",
       width: 140,
       valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) =>
-        params.row?.date
+        params?.row?.date
           ? format(new Date(params.row.date), "yyyy-MM-dd")
           : "N/A",
     },
@@ -61,7 +61,7 @@ export default function SubmittedTimesTable() {
       headerName: "Week Ending",
       width: 140,
       valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) =>
-        params.row?.weekEndingDate
+        params?.row?.weekEndingDate
           ? format(new Date(params.row.weekEndingDate), "yyyy-MM-dd")
           : "N/A",
     },
@@ -70,7 +70,7 @@ export default function SubmittedTimesTable() {
       headerName: "Total Hours",
       width: 140,
       valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) =>
-        params.row?.jobs?.reduce(
+        params?.row?.jobs?.reduce(
           (sum: number, job: TimeEntryJob) => sum + job.hoursWorked,
           0
         ) ?? 0,
@@ -80,7 +80,7 @@ export default function SubmittedTimesTable() {
       headerName: "Status",
       width: 120,
       valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) =>
-        params.row?.status ?? "Unknown",
+        params?.row?.status ?? "Unknown",
     },
   ];
 

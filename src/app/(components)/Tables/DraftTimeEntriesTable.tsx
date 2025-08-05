@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
@@ -36,34 +36,33 @@ export default function DraftTimeEntriesTable() {
       );
   }, [entries, userId, searchTerm]);
 
-  const columns: GridColDef[] = [
+  const columns: GridColDef<TimeEntryGroup>[] = [
     { field: "id", headerName: "Entry ID", width: 160 },
     {
       field: "employeeName",
       headerName: "Employee",
       width: 180,
-      valueGetter: (params: { row: TimeEntryGroup }) =>
-        params.row.user?.name ?? "N/A",
+      valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) => params?.row?.user?.name ?? "N/A",
     },
     {
       field: "date",
       headerName: "Date",
       width: 140,
-      valueGetter: (params: { row: TimeEntryGroup }) =>
-        format(new Date(params.row.date), "yyyy-MM-dd"),
+      valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) =>
+        params?.row?.date ? format(new Date(params.row.date), "yyyy-MM-dd") : "N/A",
     },
     {
       field: "jobCount",
       headerName: "Jobs",
       width: 100,
-      valueGetter: (params: { row: TimeEntryGroup }) => params.row.jobs.length,
+      valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) => params?.row?.jobs?.length ?? 0,
     },
     {
       field: "totalHours",
       headerName: "Total Hours",
       width: 140,
-      valueGetter: (params: { row: TimeEntryGroup }) =>
-        params.row.jobs?.reduce((sum, job) => sum + job.hoursWorked, 0) ?? 0,
+      valueGetter: (params: GridRenderCellParams<TimeEntryGroup>) =>
+        params?.row?.jobs?.reduce((sum, job) => sum + job.hoursWorked, 0) ?? 0,
     },
     { field: "status", headerName: "Status", width: 120 },
     {
@@ -71,12 +70,11 @@ export default function DraftTimeEntriesTable() {
       headerName: "Remove",
       sortable: false,
       width: 80,
-      renderCell: (params) => (
+      renderCell: (params: GridRenderCellParams<TimeEntryGroup>) => (
         <button
           onClick={(e) => {
             e.stopPropagation();
-            // You can wire this up with a future deleteTimeEntry mutation
-            console.log("Delete entry ID:", params.row.id);
+            console.log("Delete entry ID:", params?.row?.id);
           }}
           className="text-red-600 hover:text-red-800"
         >
