@@ -124,7 +124,7 @@ const Sidebar = () => {
             <SidebarLink
           href="/admin/drafted-times"
           icon={Archive}
-          label="Drafted Times"
+          label="My Drafted Times"
           isCollapsed={isSidebarCollapsed}
         />
             <SidebarLink
