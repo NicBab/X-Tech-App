@@ -108,7 +108,7 @@ const Sidebar = () => {
       </div>
 
       {/* LINKS */}
-      <div className="flex-grow mt-8">
+      <div className="flex-grow mt-8 text-[14px]">
         <SidebarLink
           href="/admin/admin-layout"
           icon={Layout}

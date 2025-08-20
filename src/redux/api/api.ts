@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { DLR } from "@/redux/slices/dlr/DLRTypes";
+import { DLR, DLRStatus, UpsertDLRDTO } from "@/redux/slices/dlr/DLRTypes";
 import { BaseUser } from "@/redux/slices/user/UserTypes";
 import { TimeEntryGroup } from "../slices/time/TimeTypes";
 import { UpsertTimeEntryDTO } from "../slices/time/TimeDTO";
@@ -102,6 +102,7 @@ export const api = createApi({
       query: () => "/dashboard",
       providesTags: ["DashboardMetrics"],
     }),
+
     getProducts: build.query<Product[], string | void>({
       query: (search) => ({
         url: "/products",
@@ -109,6 +110,7 @@ export const api = createApi({
       }),
       providesTags: ["Products"],
     }),
+
     createProduct: build.mutation<Product, NewProduct>({
       query: (newProduct) => ({
         url: "/products",
@@ -117,6 +119,7 @@ export const api = createApi({
       }),
       invalidatesTags: ["Products"],
     }),
+
     getUsers: build.query<User[], string | void>({
       query: (search) => ({
         url: "/users",
@@ -125,22 +128,83 @@ export const api = createApi({
       providesTags: ["Users"],
     }),
 
-    getDLRs: build.query<DLR[], string | void>({
-      query: (search) => ({
-        url: "/dlrs",
-        params: search ? { search } : {},
-      }),
-      providesTags: ["DLRs"],
-    }),
+getDLRs: build.query<
+  DLR[],
+  | {
+      search?: string;
+      userId?: string;
+      role?: "admin" | "employee";
+      status?: DLRStatus;
+    }
+  | void
+>({
+  query: (params) => ({
+    url: "/dlrs",
+    // allow old usage: if params is undefined, no query string sent
+    params: params ?? undefined,
+  }),
+  providesTags: (result) =>
+    result
+      ? [
+          ...result.map((r) => ({ type: "DLRs" as const, id: r.dlrId })),
+          { type: "DLRs" as const, id: "LIST" },
+        ]
+      : [{ type: "DLRs" as const, id: "LIST" }],
+}),
 
-    createDLR: build.mutation<DLR, NewDLR>({
-      query: (newDLR) => ({
-        url: "/dlrs",
-        method: "POST",
-        body: newDLR,
-      }),
-      invalidatesTags: ["DLRs"],
-    }),
+getDLRById: build.query<DLR, string>({
+  query: (id) => `/dlrs/${id}`,
+  providesTags: (res, err, id) => [{ type: "DLRs", id }],
+}),
+
+createDLR: build.mutation<DLR, UpsertDLRDTO>({
+  query: (body) => ({
+    url: "/dlrs",
+    method: "POST",
+    body,
+  }),
+  invalidatesTags: (res) =>
+    res
+      ? [
+          { type: "DLRs", id: res.dlrId },
+          { type: "DLRs", id: "LIST" },
+        ]
+      : [{ type: "DLRs", id: "LIST" }],
+}),
+
+updateDLR: build.mutation<DLR, { id: string } & Partial<UpsertDLRDTO>>({
+  query: ({ id, ...body }) => ({
+    url: `/dlrs/${id}`,
+    method: "PATCH",
+    body,
+  }),
+  invalidatesTags: (res, err, arg) => [
+    { type: "DLRs", id: arg.id },
+    { type: "DLRs", id: "LIST" },
+  ],
+}),
+
+submitDLR: build.mutation<DLR, string>({
+  query: (id) => ({
+    url: `/dlrs/${id}/submit`,
+    method: "PATCH",
+  }),
+  invalidatesTags: (res, err, id) => [
+    { type: "DLRs", id },
+    { type: "DLRs", id: "LIST" },
+  ],
+}),
+
+deleteDLR: build.mutation<void, string>({
+  query: (id) => ({
+    url: `/dlrs/${id}`,
+    method: "DELETE",
+  }),
+  invalidatesTags: (res, err, id) => [
+    { type: "DLRs", id },
+    { type: "DLRs", id: "LIST" },
+  ],
+}),
 
     getTimeEntries: build.query<
       TimeEntryGroup[],
@@ -225,10 +289,12 @@ export const api = createApi({
 
 export const {
   useGetDashboardMetricsQuery,
+  //USERS
+  useGetUsersQuery,
+  //PRODUCTS
   useGetProductsQuery,
   useCreateProductMutation,
   //DLRs
-  useGetUsersQuery,
   useGetDLRsQuery,
   useCreateDLRMutation,
   //TIMES

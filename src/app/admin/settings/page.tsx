@@ -1,4 +1,4 @@
-import Settings from "@/app/(components)/settings/page";
+import Settings from "@/app/(components)/settings-panel/SettingsPanel";
 import React from "react";
 
 const SettingsPage = () => {

@@ -3,7 +3,7 @@ import { UserState } from "./UserTypes";
 import { loginUser, fetchUser } from "./UserThunks";
 
 const initialState: UserState = {
-  userId: null,
+  userId: "" || null,
   name: "",
   email: "",
   phoneNumber: "",
@@ -19,7 +19,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     logoutUser: (state) => {
-      state.userId = null;
+      state.userId = "" || null;
       state.name = "";
       state.email = "";
       state.phoneNumber = "";

@@ -21,7 +21,7 @@ export default function EmployeeTimes() {
         loading={isLoading}
         error={isError}
         title="Employees Submitted Times"
-        onRowClick={(id) => router.push(`/admin/employee-times/${id}`)}
+        onRowClick={(id) => router.push(`/admin/employee-times/${String(id)}`)}
       />
     </div>
   );

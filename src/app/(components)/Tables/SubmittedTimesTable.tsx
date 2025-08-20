@@ -1,18 +1,18 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRowId, GridRowParams } from "@mui/x-data-grid";
 import { format } from "date-fns";
 import { TimeEntryGroup } from "@/redux/slices/time/TimeTypes";
 import { SearchIcon, EyeIcon, PlusCircleIcon } from "lucide-react";
 import Header from "@/app/(components)/Header";
 
 type Props = {
-  rows: TimeEntryGroup[];
+  rows: any[];
   loading?: boolean;
   error?: boolean;
   title?: string;
-  onRowClick?: (id: string) => void;
+  onRowClick?: (id: GridRowId) => void;
   onCreate?: () => void;
   showCreateButton?: boolean;
 };
@@ -126,7 +126,7 @@ export default function SubmittedTimesTable({
         rows={filteredRows}
         columns={columns}
         getRowId={(row) => row.id}
-        onRowClick={(params) => onRowClick?.(params.row.id)}
+       onRowClick={(params: GridRowParams) => onRowClick?.(params.id)}
         className="bg-white shadow rounded-lg border border-gray-200 !text-gray-700 dark:bg-zinc-900 dark:!text-gray-300"
         autoHeight
         loading={loading}

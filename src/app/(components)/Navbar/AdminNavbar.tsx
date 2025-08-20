@@ -6,6 +6,7 @@ import { Bell, Menu, Moon, Settings, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import SettingsSheet from "@/app/(components)/settings-sheet/SettingsSheet"
 
 const AdminNavbar = () => {
   const dispatch = useAppDispatch();
@@ -64,6 +65,9 @@ const AdminNavbar = () => {
               3
             </span>
           </div>
+          <div>
+<SettingsSheet/>
+          </div>
           <hr className="w-0 h-7 border border-solid border-l border-gray-300 mx-3" />
           <div className="flex items-center gap-3 cursor-pointer">
             <Image
@@ -76,9 +80,7 @@ const AdminNavbar = () => {
             <span className="font-semibold">XTech</span>
           </div>
         </div>
-        <Link href="/settings">
-          <Settings className="cursor-pointer text-gray-500" size={24} />
-        </Link>
+       
       </div>
     </div>
   );
