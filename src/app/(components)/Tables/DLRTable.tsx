@@ -1,72 +1,105 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import Header from "@/app/(components)/Header";
-import { Input } from "@/components/ui/input";
 import { PlusCircleIcon, SearchIcon } from "lucide-react";
-import { useGetDLRsQuery } from "@/redux/api/api"; // RTK query
-import { DLR } from "@/redux/slices/dlr/DLRTypes" // your existing shared type
+import { DLR } from "@/redux/slices/dlr/DLRTypes";
+import { format } from "date-fns";
 
-interface DLRTableProps {
-  role: "admin" | "user";
-  currentUserId: string;
+export interface DLRTableProps {
+  /** Pass data from the page — either prop name works */
+  data?: DLR[];
+  rows?: DLR[];
+  /** Loading flag from the page — either prop name works */
+  isLoading?: boolean;
+  loading?: boolean;
+
+  /** Who is viewing the table */
+  role: "admin" | "employee";
+  /** Needed to scope items when role is employee */
+  currentUserId?: string;
+
+  /** Optional niceties */
+  title?: string;
+  onCreateClick?: () => void;
+
+  /** Optional: row click */
+  onRowClick?: (row: DLR) => void;
 }
 
-export default function DLRTable({ role, currentUserId }: DLRTableProps) {
+export default function DLRTable({
+  data,
+  rows,
+  isLoading,
+  loading,
+  role,
+  currentUserId,
+  title = "DLRs",
+  onCreateClick,
+  onRowClick,
+}: DLRTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data = [], isLoading, isError } = useGetDLRsQuery(searchTerm);
+  const baseRows = useMemo(() => {
+    const list = (data ?? rows ?? []) as DLR[];
+    if (role === "admin") return list;
+    if (!currentUserId) return [];
+    return list.filter((r) => r.userId === currentUserId);
+  }, [data, rows, role, currentUserId]);
 
-  const filteredDLRs: DLR[] = data.filter((dlr) => {
-    const matchesUser = role === "admin" || dlr.userId === currentUserId;
-    return matchesUser;
-  });
-
-const columns: GridColDef<DLR>[] = [
-  { field: "dlrNumber", headerName: "DLR#", width: 120 },
-  { field: "jobNumber", headerName: "Job#", width: 120 },
-  {
-    field: "user",
-    headerName: "Employee",
-    width: 180,
-    valueGetter: (params: GridRenderCellParams<DLR>) => params.row?.user?.name ?? "N/A",
-  },
-  { field: "date", headerName: "Date", width: 140 },
-  { field: "customer", headerName: "Customer", width: 120 },
-  {
-    field: "status",
-    headerName: "Status",
-    width: 140,
-    renderCell: (params: GridRenderCellParams<DLR>) => {
-      const status = params.value;
-      let badgeClass = "";
-      switch (status) {
-        case "APPROVED":
-          badgeClass = "bg-green-300 text-black";
-          break;
-        case "PENDING":
-          badgeClass = "bg-yellow-200 text-black";
-          break;
-        case "REJECTED":
-          badgeClass = "bg-red-300 text-black";
-          break;
-        case "REVIEW":
-          badgeClass = "bg-blue-300 text-black";
-          break;
-        default:
-          badgeClass = "bg-gray-300 text-black";
-      }
+  const filteredRows: DLR[] = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return baseRows;
+    return baseRows.filter((dlr) => {
+      const emp = dlr.user?.name?.toLowerCase() ?? "";
       return (
-        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${badgeClass}`}>
-          {status}
-        </span>
+        dlr.dlrNumber?.toLowerCase().includes(term) ||
+        dlr.jobNumber?.toLowerCase().includes(term) ||
+        dlr.customer?.toLowerCase().includes(term) ||
+        emp.includes(term)
       );
-    },
-  },
-];
+    });
+  }, [baseRows, searchTerm]);
 
+  const cols: GridColDef<DLR>[] = [
+    { field: "dlrNumber", headerName: "DLR#", width: 120 },
+    { field: "jobNumber", headerName: "Job#", width: 120 },
+    {
+      field: "user",
+      headerName: "Employee",
+      width: 180,
+      valueGetter: (_val, row) => row?.user?.name ?? "N/A",
+    },
+    {
+      field: "date",
+      headerName: "Date",
+      width: 140,
+      valueGetter: (_val, row) =>
+        row?.date ? format(new Date(row.date), "yyyy-MM-dd") : "N/A",
+    },
+    { field: "customer", headerName: "Customer", width: 160 },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 140,
+      renderCell: (params: GridRenderCellParams<DLR>) => {
+        const status = params.value as DLR["status"];
+        const badge =
+          status === "APPROVED" ? "bg-green-300" :
+          status === "PENDING"  ? "bg-yellow-200" :
+          status === "REJECTED" ? "bg-red-300" :
+          status === "REVIEW"   ? "bg-blue-300" : "bg-gray-300";
+        return (
+          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${badge} text-black`}>
+            {status}
+          </span>
+        );
+      },
+    },
+  ];
+
+  const busy = (isLoading ?? loading) ?? false;
 
   return (
     <div className="flex flex-col">
@@ -75,8 +108,8 @@ const columns: GridColDef<DLR>[] = [
         <div className="flex items-center border-2 border-gray-200 rounded">
           <SearchIcon className="w-5 h-5 text-gray-500 m-2" />
           <input
-            className="w-full py-2 px-4 rounded bg-white text-black"
-            placeholder="Search Submitted DLRs..."
+            className="w-full py-2 px-4 rounded bg-white text-black dark:bg-zinc-800 dark:text-gray-100"
+            placeholder={`Search ${title}...`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -85,27 +118,26 @@ const columns: GridColDef<DLR>[] = [
 
       {/* HEADER & BUTTON */}
       <div className="flex justify-between items-center mb-6">
-        <Header name="Submitted DLRs" />
-        <button
-          className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={() => setIsModalOpen(true)}
-        >
-          <PlusCircleIcon className="w-5 h-5 mr-2" /> Create DLR
-        </button>
+        <Header name={title} />
+        {onCreateClick && (
+          <button
+            className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={onCreateClick}
+          >
+            <PlusCircleIcon className="w-5 h-5 mr-2" /> Create DLR
+          </button>
+        )}
       </div>
 
-      {isError ? (
-        <p className="text-red-600">Failed to fetch DLRs.</p>
-      ) : (
-        <DataGrid
-          rows={filteredDLRs}
-          columns={columns}
-          getRowId={(row: DLR) => row.dlrId}
-          autoHeight
-          loading={isLoading}
-          className="bg-white shadow rounded-lg border border-gray-200 !text-gray-700 dark:bg-zinc-900 dark:!text-gray-300"
-        />
-      )}
+      <DataGrid
+        rows={filteredRows}
+        columns={cols}
+        getRowId={(row: DLR) => row.dlrId}
+        autoHeight
+        loading={busy}
+        onRowClick={(params) => onRowClick?.(params.row as DLR)}
+        className="bg-white shadow rounded-lg border border-gray-200 !text-gray-700 dark:bg-zinc-900 dark:!text-gray-300"
+      />
     </div>
   );
 }
