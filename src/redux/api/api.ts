@@ -280,6 +280,29 @@ deleteDLR: build.mutation<void, string>({
       ],
     }),
 
+    resubmitTimeEntry: build.mutation<
+  TimeEntryGroup,
+  { id: string; payload: {
+    userId: string;
+    date: string | Date;
+    weekEndingDate: string | Date;
+    notes?: string | null;
+    jobs: Array<{
+      jobNumber: string;
+      hoursWorked: number;
+      comments?: string | null;
+      mileage?: number | null;
+      extraExpenses?: string | null;
+    }>;
+  } }
+>({
+  query: ({ id, payload }) => ({
+    url: `/times/${id}/resubmit`,
+    method: "POST",
+    body: payload,
+  }),
+}),
+
     getExpensesByCategory: build.query<ExpenseByCategorySummary[], void>({
       query: () => "/expenses",
       providesTags: ["Expenses"],
@@ -304,6 +327,7 @@ export const {
   useDeleteTimeEntryMutation,
   useGetTimeEntryByIdQuery,
   useUpdateTimeEntryMutation,
+  useResubmitTimeEntryMutation,
   //EXPENSES
   useGetExpensesByCategoryQuery,
 } = api;

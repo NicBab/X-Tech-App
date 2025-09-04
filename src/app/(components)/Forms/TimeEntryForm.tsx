@@ -6,55 +6,75 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { format, endOfWeek } from "date-fns";
 import { ClockIcon } from "lucide-react";
-import { toast } from "react-hot-toast";
-import { useUpsertTimeEntryMutation, useUpdateTimeEntryMutation, } from "@/redux/api/api";
+import toast from "react-hot-toast";
+
+import {
+  useUpsertTimeEntryMutation,
+  useUpdateTimeEntryMutation,
+  useResubmitTimeEntryMutation, // <-- new RTK mutation
+} from "@/redux/api/api";
 import { useAppSelector } from "@/redux/hooks";
 import { TimeEntryGroup } from "@/redux/slices/time/TimeTypes";
 import { UpsertTimeEntryDTO } from "@/redux/slices/time/TimeDTO";
 
+type Props = {
+  initialGroup?: TimeEntryGroup;                                  // prefill (draft or submitted)
+  editingId?: string;                                             // PATCH /times/:id (draft editing)
+  resubmitId?: string;                                            // POST  /times/:id/resubmit (replace submitted)
+  onDone?: (updated?: Partial<TimeEntryGroup>) => void;           // callback after success
+};
+
 interface JobEntry {
   jobNumber: string;
-  startTime: string; // "HH:mm"
-  endTime: string;   // "HH:mm"
+  startTime: string;   // "HH:mm" (UI-only)
+  endTime: string;     // "HH:mm" (UI-only)
   notes: string;
-  // show existing hours when editing
-  existingHours?: number;
+  existingHours?: number; // show saved hours when editing (no times entered)
 }
 
 export default function TimeEntryForm({
   initialGroup,
   editingId,
+  resubmitId,
   onDone,
-}: {
-  initialGroup?: TimeEntryGroup;
-  editingId?: string;
-  onDone?: () => void;
-}) {
+}: Props) {
   const userId = useAppSelector((s) => s.user.userId) ?? "";
 
-  const [date, setDate] = useState<string>(initialGroup ? format(new Date(initialGroup.date), "yyyy-MM-dd") : "2025-07-08");
+  // group-level notes
+  const [groupNotes, setGroupNotes] = useState<string>("");
+
+  // date
+  const [date, setDate] = useState<string>(
+    initialGroup ? format(new Date(initialGroup.date), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd")
+  );
+
+  // jobs
   const [jobs, setJobs] = useState<JobEntry[]>([
     { jobNumber: "", startTime: "", endTime: "", notes: "" },
   ]);
 
+  // RTK mutations
+  const [upsert, upsertState] = useUpsertTimeEntryMutation();
+  const [updateEntry, updateState] = useUpdateTimeEntryMutation();
+  const [resubmitEntry, resubmitState] = useResubmitTimeEntryMutation();
 
   useEffect(() => {
-    if (initialGroup) {
-      setDate(format(new Date(initialGroup.date), "yyyy-MM-dd"));
-      setJobs(
-        (initialGroup.jobs ?? []).map((j) => ({
-          jobNumber: j.jobNumber,
-          startTime: "",     // not stored in DB
-          endTime: "",       // not stored in DB
-          notes: j.comments ?? "",
-          existingHours: Number(j.hoursWorked) || 0,
-        }))
-      );
-    }
-  }, [initialGroup]);
+    if (!initialGroup) return;
 
-  const [upsert, { isLoading }] = useUpsertTimeEntryMutation();
-  const [updateEntry, { isLoading: isUpdating }] = useUpdateTimeEntryMutation();
+    setDate(format(new Date(initialGroup.date), "yyyy-MM-dd"));
+    setGroupNotes(initialGroup.notes ?? "");
+
+    const mapped: JobEntry[] =
+      (initialGroup.jobs ?? []).map((j) => ({
+        jobNumber: j.jobNumber,
+        startTime: "", // UI-only
+        endTime: "",   // UI-only
+        notes: j.comments ?? "",
+        existingHours: Number(j.hoursWorked) || 0,
+      })) || [];
+
+    setJobs(mapped.length ? mapped : [{ jobNumber: "", startTime: "", endTime: "", notes: "" }]);
+  }, [initialGroup]);
 
   const weekEnd = useMemo(
     () => format(endOfWeek(new Date(date), { weekStartsOn: 1 }), "yyyy-MM-dd"),
@@ -75,7 +95,6 @@ export default function TimeEntryForm({
     () =>
       jobs.reduce((sum, j) => {
         const fromTimes = getDurationInHours(j.startTime, j.endTime);
-        // prefer explicitly entered times, else fall back to existing hours in edit mode
         return sum + (fromTimes > 0 ? fromTimes : (j.existingHours ?? 0));
       }, 0),
     [jobs]
@@ -89,26 +108,49 @@ export default function TimeEntryForm({
     });
   };
 
-  const handleAddJob = () => {
+  const handleAddJob = () =>
     setJobs((prev) => [...prev, { jobNumber: "", startTime: "", endTime: "", notes: "" }]);
-  };
-  const handleRemoveJob = (index: number) => {
+
+  const handleRemoveJob = (index: number) =>
     setJobs((prev) => prev.filter((_, i) => i !== index));
-  };
 
   const buildPayload = (status: "DRAFT" | "SUBMITTED"): UpsertTimeEntryDTO => {
     const apiJobs = jobs
-      .filter((j) => j.jobNumber.trim() !== "")
-      .map((j) => {
-        const fromTimes = getDurationInHours(j.startTime, j.endTime);
-        const hoursWorked = Number((fromTimes > 0 ? fromTimes : (j.existingHours ?? 0)).toFixed(2));
-        const job: any = {
-          jobNumber: j.jobNumber.trim(),
-          hoursWorked,
-        };
-        if (j.notes?.trim()) job.comments = j.notes.trim();
-        return job;
-      });
+  .filter((j) => j.jobNumber.trim() !== "")
+  .map((j) => {
+    const fromTimes = getDurationInHours(j.startTime, j.endTime);
+    const hoursWorked = Number(
+      (fromTimes > 0 ? fromTimes : (j.existingHours ?? 0)).toFixed(2)
+    );
+
+    //only include fields you have; no nulls
+    const job: { jobNumber: string; hoursWorked: number; comments?: string } = {
+      jobNumber: j.jobNumber.trim(),
+      hoursWorked,
+    };
+    if (j.notes?.trim()) job.comments = j.notes.trim();
+    return job;
+  });
+    // const apiJobs = jobs
+    //   .filter((j) => j.jobNumber.trim() !== "")
+    //   .map((j) => {
+    //     const fromTimes = getDurationInHours(j.startTime, j.endTime);
+    //     const hoursWorked = Number(
+    //       (fromTimes > 0 ? fromTimes : (j.existingHours ?? 0)).toFixed(2)
+    //     );
+    //     const job: {
+    //       jobNumber: string;
+    //       hoursWorked: number;
+    //       comments?: string;
+    //       mileage?: number | null;
+    //       extraExpenses?: string | null;
+    //     } = {
+    //       jobNumber: j.jobNumber.trim(),
+    //       hoursWorked,
+    //     };
+    //     if (j.notes?.trim()) job.comments = j.notes.trim();
+    //     return job;
+    //   });
 
     const dto: UpsertTimeEntryDTO = {
       ...(editingId ? { id: editingId } : {}),
@@ -116,49 +158,86 @@ export default function TimeEntryForm({
       date,
       weekEndingDate: weekEnd,
       status,
+      notes: groupNotes?.trim() ? groupNotes.trim() : undefined,
       jobs: apiJobs,
     };
     return dto;
   };
 
-const onSaveDraft = async () => {
-  if (!userId) return toast.error("No userId found.");
-  const dto = buildPayload("DRAFT");
-  try {
-    if (editingId) {
-      await updateEntry({ id: editingId, ...dto }).unwrap();   // <-- PATCH path
-    } else {
-      await upsert(dto).unwrap();                               // <-- POST path
-    }
-    toast.success("Draft saved");
-    onDone?.();
-  } catch (e) {
-    console.error(e);
-    toast.error("Failed to save draft");
-  }
-};
+  const busy = upsertState.isLoading || updateState.isLoading || resubmitState.isLoading;
 
-const onSubmit = async () => {
-  if (!userId) return toast.error("No userId found.");
-  const dto = buildPayload("SUBMITTED");
-  try {
-    if (editingId) {
-      await updateEntry({ id: editingId, ...dto }).unwrap();   // <-- PATCH path
-    } else {
-      await upsert(dto).unwrap();                               // <-- POST path
+  const onSaveDraft = async () => {
+    if (!userId) return toast.error("No userId found.");
+    if (resubmitId) {
+      // If you want to allow "save as draft" during resubmit, you could implement
+      // a separate mutation to create a DRAFT here. For now, we block it:
+      return toast.error("Saving draft is not available while re-submitting.");
     }
-    toast.success("Time entry submitted");
-    onDone?.();
-  } catch (e) {
-    console.error(e);
-    toast.error("Failed to submit time entry");
-  }
-};
+
+    const dto = buildPayload("DRAFT");
+    try {
+      await toast.promise(
+        editingId
+          ? updateEntry({ id: editingId, ...dto }).unwrap() // PATCH /times/:id
+          : upsert(dto).unwrap(),                            // POST /times
+        { loading: "Saving draft…", success: "Draft saved", error: "Failed to save draft" }
+      );
+      onDone?.();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const onSubmit = async () => {
+    if (!userId) return toast.error("No userId found.");
+
+    const dto = buildPayload("SUBMITTED");
+
+    // Simple guard: require positive hours to submit
+    const total = dto.jobs.reduce((s, j) => s + (Number(j.hoursWorked) || 0), 0);
+    if (total <= 0) return toast.error("Total hours must be greater than 0 to submit.");
+
+    try {
+      if (resubmitId) {
+        // RE-SUBMIT (replace a submitted record)
+        await toast.promise(
+          resubmitEntry({
+            id: resubmitId,
+            payload: {
+              userId: dto.userId,
+              date: dto.date,
+              weekEndingDate: dto.weekEndingDate,
+              notes: dto.notes ?? null,
+              jobs: dto.jobs,
+            },
+          }).unwrap(),
+          { loading: "Re-submitting…", success: "Re-submitted", error: "Failed to re-submit" }
+          );
+        onDone?.();
+        return;
+      }
+
+      // Normal create/patch submit (draft -> submitted or fresh submitted)
+      await toast.promise(
+        editingId
+          ? updateEntry({ id: editingId, ...dto }).unwrap() // PATCH /times/:id
+          : upsert(dto).unwrap(),                            // POST /times
+        { loading: "Submitting…", success: "Time entry submitted", error: "Failed to submit" }
+      );
+      onDone?.();
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white border rounded-xl shadow-md space-y-6 dark:bg-zinc-900 dark:border-zinc-700 mt-20">
       <h2 className="text-2xl font-bold text-center">
-        {editingId ? "Edit Draft Time Entry" : "Employee Time Entry"}
+        {resubmitId
+          ? "Re-submit Time Entry"
+          : editingId
+          ? "Edit Draft Time Entry"
+          : "Employee Time Entry"}
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -166,11 +245,19 @@ const onSubmit = async () => {
         <Input disabled value={`Week Ending: ${weekEnd}`} />
       </div>
 
+      {/* Group notes (optional) */}
+      <Textarea
+        placeholder="Overall notes (optional)…"
+        value={groupNotes}
+        onChange={(e) => setGroupNotes(e.target.value)}
+      />
+
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Jobs for the Day</h3>
         {jobs.map((job, index) => {
           const timeHours = getDurationInHours(job.startTime, job.endTime);
           const displayHours = timeHours > 0 ? timeHours : (job.existingHours ?? 0);
+
           return (
             <div key={index} className="border rounded-md p-4 space-y-3 bg-gray-50 dark:bg-zinc-800">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -202,7 +289,7 @@ const onSubmit = async () => {
               </div>
 
               <Textarea
-                placeholder="Optional notes for this job..."
+                placeholder="Optional notes for this job…"
                 value={job.notes}
                 onChange={(e) => handleChange(index, "notes", e.target.value)}
               />
@@ -210,7 +297,7 @@ const onSubmit = async () => {
               <div className="flex justify-between items-center pt-2">
                 <span className="text-sm font-medium text-gray-500 dark:text-gray-300">
                   Hours: {displayHours.toFixed(2)}
-                  {job.existingHours && timeHours === 0 ? " (from saved draft)" : ""}
+                  {job.existingHours && timeHours === 0 ? " (from saved entry)" : ""}
                 </span>
                 <Button variant="destructive" size="sm" onClick={() => handleRemoveJob(index)}>
                   Remove Job
@@ -219,7 +306,9 @@ const onSubmit = async () => {
             </div>
           );
         })}
-        <Button onClick={handleAddJob} type="button">+ Add Another Job</Button>
+        <Button onClick={handleAddJob} type="button" variant="secondary">
+          + Add Another Job
+        </Button>
       </div>
 
       <div className="text-right text-sm font-semibold">
@@ -227,11 +316,18 @@ const onSubmit = async () => {
       </div>
 
       <div className="flex justify-end gap-4">
-        <Button variant="secondary" onClick={onSaveDraft} disabled={isLoading} type="button">
-          Save Draft
-        </Button>
-        <Button onClick={onSubmit} disabled={isLoading} type="button">
-          Submit
+        {!resubmitId && (
+          <Button
+            variant="secondary"
+            onClick={onSaveDraft}
+            disabled={busy}
+            type="button"
+          >
+            Save Draft
+          </Button>
+        )}
+        <Button onClick={onSubmit} disabled={busy} type="button">
+          {resubmitId ? "Re-submit" : "Submit"}
         </Button>
       </div>
     </div>
